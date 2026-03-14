@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhruv Gupta — Backend Engineer & Security Researcher</title>
+<meta name="description" content="12 years building systems that scale. Backend engineering, cybersecurity, and open source tools.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:         #000000;
+  --surface:    rgba(255,51,153,0.06);
+  --border:     rgba(255,51,153,0.2);
+  --border2:    rgba(255,51,153,0.45);
+  --text:       #FFFFFF;
+  --pink:       #FF3399;
+  --pink-dim:   #E0287F;
+  --radius:     8px;
+  --radius-lg:  12px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+::selection { background: var(--pink); color: white; }
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 3px;
+  color: var(--pink);
+}
+.nav-links {
+  display: flex;
+  gap: 0.15rem;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.nav-links a:hover { color: var(--pink); }
+
+/* ── CONTAINER ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+
+/* ── HERO ── */
+.hero {
+  padding: 7rem 0 3.5rem;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--pink);
+  background: rgba(255,51,153,0.1);
+  border: 1px solid rgba(255,51,153,0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  margin-bottom: 1.25rem;
+}
+.hero-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--pink);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--pink);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: 3px;
+  max-width: 800px;
+  margin-bottom: 1rem;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--pink);
+}
+.hero-sub {
+  font-size: 1.1rem;
+  color: #FFFFFF;
+  max-width: 540px;
+  line-height: 1.7;
+  margin-bottom: 1.75rem;
+  font-weight: 500;
+}
+.hero-btns {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+.btn-primary {
+  background: var(--pink);
+  color: #FFFFFF;
+  font-weight: 700;
+}
+.btn-primary:hover { background: var(--pink-dim); }
+.btn-outline { background: transparent; border: 2px solid #FFFFFF; color: #FFFFFF; font-weight: 700; }
+.btn-outline:hover { border-color: var(--pink); color: var(--pink); }
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.hero-tag {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  transition: all 0.15s;
+}
+.hero-tag:hover { border-color: var(--pink); color: var(--pink); }
+
+/* ── SECTIONS ── */
+section { padding: 3rem 0; }
+.section-border { border-top: 1px solid var(--border); }
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 0.4rem;
+}
+.section-heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 400;
+  letter-spacing: 2px;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+.section-sub {
+  font-size: 1rem;
+  color: #FFFFFF;
+  max-width: 540px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+/* ── ABOUT ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+.about-text p {
+  font-size: 1rem;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+  line-height: 1.7;
+  font-weight: 500;
+}
+.about-text strong { color: var(--pink); font-weight: 700; }
+
+.about-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+.stat-card:hover { border-color: var(--pink); }
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 1px;
+  color: var(--pink);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.stat-label { font-size: 0.8rem; color: #FFFFFF; font-weight: 600; }
+
+/* ── SKILLS ── */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.skill-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: all 0.2s;
+}
+.skill-group:hover { border-color: var(--pink); }
+.skill-group h3 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--pink);
+  margin-bottom: 0.75rem;
+}
+.pills { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.pill {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  color: #FFFFFF;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.pill:hover { border-color: var(--pink); color: var(--pink); }
+.pill.primary { border-color: var(--pink); color: var(--pink); font-weight: 700; }
+
+/* ── PROJECTS ── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.project-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: block;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--pink);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.project-card:hover {
+  border-color: var(--pink);
+  transform: translateY(-2px);
+}
+.project-card:hover::before { opacity: 1; }
+.project-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+.project-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  letter-spacing: 2px;
+  color: var(--pink);
+}
+.project-arrow {
+  font-size: 1.25rem;
+  color: #FFFFFF;
+  transition: all 0.2s;
+}
+.project-card:hover .project-arrow { color: var(--pink); transform: translate(2px, -2px); }
+.project-desc {
+  font-size: 0.92rem;
+  color: #FFFFFF;
+  font-weight: 500;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+.project-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.75rem; }
+.project-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: #FFFFFF;
+}
+.project-tag.go { border-color: var(--pink); color: var(--pink); }
+
+.project-features { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.project-feat {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(255,51,153,0.08);
+  border: 1px solid rgba(255,51,153,0.15);
+  color: var(--pink);
+}
+
+.project-code {
+  margin-top: 0.75rem;
+  background: rgba(255,51,153,0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: #FFFFFF;
+  overflow-x: auto;
+}
+.project-code .cmd { color: var(--pink); font-weight: 700; }
+.project-code .flag { color: #FFFFFF; }
+.project-code .out { color: var(--pink); }
+
+/* ── EXPERIENCE ── */
+.timeline-item {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 2rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.timeline-item:hover { padding-left: 0.4rem; }
+.timeline-item:last-child { border-bottom: none; }
+.timeline-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--pink);
+  font-weight: 700;
+  padding-top: 0.15rem;
+}
+.timeline-content h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  color: #FFFFFF;
+}
+.timeline-content p {
+  font-size: 0.9rem;
+  color: #FFFFFF;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* ── SECURITY ── */
+.security-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.security-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+.security-stat:hover { border-color: var(--pink); }
+.security-stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  letter-spacing: 1px;
+  color: var(--pink);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.security-stat-label { font-size: 0.8rem; color: #FFFFFF; font-weight: 600; }
+
+.security-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.security-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: all 0.2s;
+}
+.security-card:hover { border-color: var(--pink); }
+.security-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  color: var(--pink);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.security-card h3 .icon { font-size: 1.1rem; }
+.security-card p { font-size: 0.88rem; color: #FFFFFF; font-weight: 500; line-height: 1.6; }
+
+/* ── CONTACT ── */
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+  position: relative;
+  z-index: 1;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--pink);
+}
+.footer-copy { font-size: 0.78rem; color: #FFFFFF; font-weight: 600; }
+.footer-links { display: flex; gap: 1.25rem; }
+.footer-links a { font-size: 0.85rem; color: #FFFFFF; font-weight: 600; transition: color 0.15s; }
+.footer-links a:hover { color: var(--pink); }
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .about-grid, .projects-grid, .security-grid, .contact-grid { grid-template-columns: 1fr; }
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+  .security-stats { grid-template-columns: 1fr 1fr 1fr; }
+  .timeline-item { grid-template-columns: 1fr; gap: 0.35rem; }
+  .nav-links { display: none; }
+}
+@media (max-width: 600px) {
+  .hero { padding: 6rem 0 3rem; }
+  .hero h1 { font-size: 2.5rem; }
+  .skills-grid { grid-template-columns: 1fr; }
+  .security-stats { grid-template-columns: 1fr; }
+  .about-stats { grid-template-columns: 1fr 1fr; }
+  .container { padding: 0 1.25rem; }
+}
+
+/* ── PARTICLE CANVAS ── */
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: all;
+  cursor: crosshair;
+}
+.container, nav, footer { position: relative; z-index: 1; pointer-events: auto; }
+nav { z-index: 100; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,51,153,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-name">Dhruv Gupta</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">Available for projects</div>
+    <h1 class="reveal">Backend engineer<br>who builds <em>& breaks</em><br>things.</h1>
+    <p class="hero-sub reveal">12 years building systems that scale, writing code that survives production, and hunting vulnerabilities before attackers do.</p>
+
+    <div class="hero-btns reveal">
+      <a class="btn btn-primary" href="#contact">Get in touch</a>
+      <a class="btn btn-outline" href="https://github.com/devthedeveloper" target="_blank" rel="noopener">GitHub &nearr;</a>
+    </div>
+
+    <div class="hero-tags reveal">
+      <span class="hero-tag">Go</span>
+      <span class="hero-tag">Node.js</span>
+      <span class="hero-tag">Microservices</span>
+      <span class="hero-tag">APIs</span>
+      <span class="hero-tag">System Design</span>
+      <span class="hero-tag">Cybersecurity</span>
+      <span class="hero-tag">Bug Bounty</span>
+      <span class="hero-tag">DevOps</span>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="section-border">
+  <div class="container">
+    <div class="section-label reveal">About</div>
+    <div class="section-heading reveal">A bit about me</div>
+
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I've spent <strong>12 years</strong> in backend development — building APIs that handle millions of requests, designing distributed systems, and writing code that doesn't fall apart at 3 AM.</p>
+        <p>My primary tools are <strong>Go</strong> and <strong>Node.js</strong>, but I've written production code in nearly every language that compiles, interprets, or transpiles.</p>
+        <p>When I'm not building, I'm <strong>breaking</strong> — hunting vulnerabilities through bug bounty programs. Understanding how systems fail makes me better at building systems that don't.</p>
+      </div>
+
+      <div class="about-stats reveal">
+        <div class="stat-card">
+          <div class="stat-val" data-count="12">0</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" data-count="100" data-suffix="+">0</div>
+          <div class="stat-label">Projects Delivered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" data-count="50" data-suffix="+">0</div>
+          <div class="stat-label">Bugs Reported</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" data-count="10" data-suffix="+">0</div>
+          <div class="stat-label">Languages Used</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="section-border">
+  <div class="container">
+    <div class="section-label reveal">Skills</div>
+    <div class="section-heading reveal">Tech stack</div>
+    <p class="section-sub reveal">Tools and technologies I use to build, scale, and secure software.</p>
+
+    <div class="skills-grid">
+      <div class="skill-group reveal">
+        <h3>Languages</h3>
+        <div class="pills">
+          <span class="pill primary">Go</span>
+          <span class="pill primary">JavaScript</span>
+          <span class="pill primary">TypeScript</span>
+          <span class="pill">Python</span>
+          <span class="pill">Rust</span>
+          <span class="pill">C/C++</span>
+          <span class="pill">Java</span>
+          <span class="pill">Ruby</span>
+          <span class="pill">PHP</span>
+          <span class="pill">Bash</span>
+          <span class="pill">SQL</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <h3>Backend</h3>
+        <div class="pills">
+          <span class="pill primary">Gin / Echo / Fiber</span>
+          <span class="pill primary">Express / Fastify</span>
+          <span class="pill primary">NestJS</span>
+          <span class="pill">gRPC</span>
+          <span class="pill">GraphQL</span>
+          <span class="pill">REST APIs</span>
+          <span class="pill">WebSockets</span>
+          <span class="pill">Microservices</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <h3>Databases</h3>
+        <div class="pills">
+          <span class="pill primary">PostgreSQL</span>
+          <span class="pill primary">MongoDB</span>
+          <span class="pill primary">Redis</span>
+          <span class="pill">MySQL</span>
+          <span class="pill">Elasticsearch</span>
+          <span class="pill">DynamoDB</span>
+          <span class="pill">Kafka</span>
+          <span class="pill">RabbitMQ</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <h3>Cloud & DevOps</h3>
+        <div class="pills">
+          <span class="pill primary">AWS</span>
+          <span class="pill primary">Docker</span>
+          <span class="pill primary">Kubernetes</span>
+          <span class="pill">GCP</span>
+          <span class="pill">Terraform</span>
+          <span class="pill">CI/CD</span>
+          <span class="pill">Linux</span>
+          <span class="pill">Nginx</span>
+          <span class="pill">GitHub Actions</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <h3>Security</h3>
+        <div class="pills">
+          <span class="pill primary">Penetration Testing</span>
+          <span class="pill primary">Bug Bounty</span>
+          <span class="pill">OWASP Top 10</span>
+          <span class="pill">Burp Suite</span>
+          <span class="pill">Network Security</span>
+          <span class="pill">Web App Security</span>
+          <span class="pill">API Security</span>
+          <span class="pill">Code Auditing</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <h3>Architecture</h3>
+        <div class="pills">
+          <span class="pill primary">System Design</span>
+          <span class="pill primary">Distributed Systems</span>
+          <span class="pill">Event-Driven</span>
+          <span class="pill">CQRS</span>
+          <span class="pill">Domain-Driven Design</span>
+          <span class="pill">Clean Architecture</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="section-border">
+  <div class="container">
+    <div class="section-label reveal">Open Source</div>
+    <div class="section-heading reveal">Things I've built</div>
+    <p class="section-sub reveal">Security-focused CLI tools written in Go. Zero dependencies, single binaries.</p>
+
+    <div class="projects-grid">
+      <a href="https://github.com/devthedeveloper/passgen" target="_blank" rel="noopener" class="project-card reveal">
+        <div class="project-card-head">
+          <div class="project-name">passgen</div>
+          <span class="project-arrow">&nearr;</span>
+        </div>
+        <p class="project-desc">Cryptographically secure password generator. Random or segmented passwords, interactive prompts, auto clipboard copy. Runs everywhere.</p>
+        <div class="project-tags">
+          <span class="project-tag go">Go</span>
+          <span class="project-tag">CLI</span>
+          <span class="project-tag">crypto/rand</span>
+          <span class="project-tag">Cross-platform</span>
+        </div>
+        <div class="project-features">
+          <span class="project-feat">Quick mode</span>
+          <span class="project-feat">Interactive</span>
+          <span class="project-feat">Segmented</span>
+          <span class="project-feat">Auto clipboard</span>
+          <span class="project-feat">5 platforms</span>
+        </div>
+        <div class="project-code">
+<span class="out"># one keystroke, instant password</span>
+<span class="cmd">passgen</span> <span class="flag">-</span>
+nJ0aK-6V96F-zMtQs-o8kuh-sZty9
+
+<span class="cmd">passgen</span> <span class="flag">-length 32 -no-symbols</span>
+</div>
+      </a>
+
+      <a href="https://github.com/devthedeveloper/totp" target="_blank" rel="noopener" class="project-card reveal">
+        <div class="project-card-head">
+          <div class="project-name">totp</div>
+          <span class="project-arrow">&nearr;</span>
+        </div>
+        <p class="project-desc">Terminal TOTP authenticator. Stores 2FA secrets in an AES-256-GCM encrypted vault with live countdown, auto clipboard, and otpauth:// support.</p>
+        <div class="project-tags">
+          <span class="project-tag go">Go</span>
+          <span class="project-tag">CLI</span>
+          <span class="project-tag">AES-256-GCM</span>
+          <span class="project-tag">PBKDF2</span>
+          <span class="project-tag">RFC 6238</span>
+        </div>
+        <div class="project-features">
+          <span class="project-feat">Encrypted vault</span>
+          <span class="project-feat">Live countdown</span>
+          <span class="project-feat">otpauth://</span>
+          <span class="project-feat">Prefix match</span>
+          <span class="project-feat">Export</span>
+        </div>
+        <div class="project-code">
+<span class="out"># live code with countdown</span>
+<span class="cmd">totp</span> <span class="flag">github</span>
+482 159  ████████░░ 18s  ✓ copied
+
+<span class="cmd">totp</span> <span class="flag">add</span> "otpauth://totp/..."
+</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience" class="section-border">
+  <div class="container">
+    <div class="section-label reveal">Experience</div>
+    <div class="section-heading reveal">Career timeline</div>
+    <p class="section-sub reveal">From junior developer to building and securing systems at scale.</p>
+
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2024 — Present</div>
+        <div class="timeline-content">
+          <h3>Senior Backend Engineer & Freelancer</h3>
+          <p>Building robust backends and scalable architectures for global clients. Specializing in Go and Node.js microservices. Concurrent bug bounty hunting across major platforms.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2020 — 2024</div>
+        <div class="timeline-content">
+          <h3>Lead Backend Engineer</h3>
+          <p>Led teams building high-throughput distributed systems processing millions of daily transactions. Designed event-driven architectures and API gateways. Mentored junior engineers.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2017 — 2020</div>
+        <div class="timeline-content">
+          <h3>Senior Software Engineer</h3>
+          <p>Migrated monolithic applications to microservices. Built real-time data pipelines and implemented CI/CD workflows. Introduced Go to the engineering team.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2014 — 2017</div>
+        <div class="timeline-content">
+          <h3>Backend Developer</h3>
+          <p>Developed RESTful APIs, database schemas, and server-side logic across Node.js, Python, and Java. First exposure to cybersecurity through CTF competitions.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2012 — 2014</div>
+        <div class="timeline-content">
+          <h3>Junior Developer</h3>
+          <p>Started the journey. Wrote code in everything I could get my hands on. Learned that production is a different beast. Fell in love with backend systems.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section id="security" class="section-border">
+  <div class="container">
+    <div class="section-label reveal">Cybersecurity</div>
+    <div class="section-heading reveal">Security expertise</div>
+    <p class="section-sub reveal">Building secure systems and finding vulnerabilities in existing ones.</p>
+
+    <div class="security-stats reveal">
+      <div class="security-stat">
+        <div class="security-stat-val" data-count="12">0</div>
+        <div class="security-stat-label">Years Experience</div>
+      </div>
+      <div class="security-stat">
+        <div class="security-stat-val" data-count="50" data-suffix="+">0</div>
+        <div class="security-stat-label">Bugs Reported</div>
+      </div>
+      <div class="security-stat">
+        <div class="security-stat-val" data-count="100" data-suffix="+">0</div>
+        <div class="security-stat-label">Projects Delivered</div>
+      </div>
+    </div>
+
+    <div class="security-grid">
+      <div class="security-card reveal">
+        <h3><span class="icon">&#128270;</span> Bug Bounty Hunter</h3>
+        <p>Active hunter across major platforms. Specializing in web applications, APIs, and backend systems. From IDOR to RCE — if there's a weakness, I'll find it.</p>
+      </div>
+      <div class="security-card reveal">
+        <h3><span class="icon">&#128221;</span> Secure Code Review</h3>
+        <p>Auditing codebases for security vulnerabilities before attackers do. Specializing in backend code review across Go, Node.js, and Python.</p>
+      </div>
+      <div class="security-card reveal">
+        <h3><span class="icon">&#128737;</span> Penetration Testing</h3>
+        <p>Manual and automated testing of web applications, APIs, and infrastructure. Thinking like an attacker so your systems don't face one unprepared.</p>
+      </div>
+      <div class="security-card reveal">
+        <h3><span class="icon">&#127959;</span> Security Architecture</h3>
+        <p>Building security into architecture from the start. Authentication flows, authorization models, data encryption, and secure API design.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section-border">
+  <div class="container">
+    <div class="section-label reveal">Contact</div>
+    <div class="section-heading reveal">Let's work together</div>
+
+    <div class="reveal">
+      <p style="font-size:1.05rem; color:#FFFFFF; font-weight:500; line-height:1.7; margin-bottom:1.5rem; max-width:540px;">Got a project? Need a backend built right? Want your application security-tested? Drop me a mail.</p>
+
+      <a href="mailto:dhruvgupta1992@gmail.com" class="btn btn-primary" style="margin-right:0.75rem;">dhruvgupta1992@gmail.com &rarr;</a>
+      <a href="https://github.com/devthedeveloper" target="_blank" rel="noopener" class="btn btn-outline">GitHub &nearr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-name">Dhruv Gupta</div>
+    <div class="footer-copy">&copy; 2026. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="mailto:dhruvgupta1992@gmail.com">Email</a>
+      <a href="https://github.com/devthedeveloper" target="_blank" rel="noopener">GitHub</a>
+      <a href="#hero">Back to top &uarr;</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 50);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── COUNTER ANIMATION ──
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      let current = 0;
+      const step = Math.ceil(target / 35);
+      const interval = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(interval); }
+        el.textContent = current + suffix;
+      }, 30);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+// ── ACTIVE NAV ──
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    if (window.scrollY >= section.offsetTop - 200) current = '#' + section.id;
+  });
+  navLinks.forEach(link => {
+    link.style.color = link.getAttribute('href') === current ? '#FF3399' : '';
+    link.style.background = '';
+  });
+});
+
+// ── INTERACTIVE PARTICLES ──
+(function() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  const mouse = { x: -9999, y: -9999, radius: 120 };
+  const particles = [];
+  const MAX = 80;
+  const CONNECT_DIST = 140;
+  const BURST_COUNT = 12;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Particle {
+    constructor(x, y, burst) {
+      this.x = x || Math.random() * W;
+      this.y = y || Math.random() * H;
+      const speed = burst ? (1.5 + Math.random() * 3) : (0.2 + Math.random() * 0.5);
+      const angle = Math.random() * Math.PI * 2;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
+      this.size = burst ? (1.5 + Math.random() * 2.5) : (1 + Math.random() * 2);
+      this.life = burst ? (40 + Math.random() * 40) : Infinity;
+      this.maxLife = this.life;
+      this.burst = burst;
+    }
+
+    update() {
+      // mouse repulsion
+      const dx = this.x - mouse.x;
+      const dy = this.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < mouse.radius && dist > 0) {
+        const force = (mouse.radius - dist) / mouse.radius;
+        this.vx += (dx / dist) * force * 0.8;
+        this.vy += (dy / dist) * force * 0.8;
+      }
+
+      // friction
+      if (!this.burst) {
+        this.vx *= 0.99;
+        this.vy *= 0.99;
+        // drift back to gentle speed
+        const spd = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (spd < 0.2) {
+          this.vx += (Math.random() - 0.5) * 0.05;
+          this.vy += (Math.random() - 0.5) * 0.05;
+        }
+      } else {
+        this.vx *= 0.97;
+        this.vy *= 0.97;
+        this.life--;
+      }
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // wrap edges
+      if (this.x < -20) this.x = W + 20;
+      if (this.x > W + 20) this.x = -20;
+      if (this.y < -20) this.y = H + 20;
+      if (this.y > H + 20) this.y = -20;
+    }
+
+    draw() {
+      let alpha = 0.6;
+      if (this.burst) alpha = 0.9 * (this.life / this.maxLife);
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 51, 153, ${alpha})`;
+      ctx.fill();
+    }
+  }
+
+  // seed particles
+  for (let i = 0; i < MAX; i++) particles.push(new Particle());
+
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CONNECT_DIST) {
+          const alpha = (1 - dist / CONNECT_DIST) * 0.15;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(255, 51, 153, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  // mouse line connections
+  function drawMouseLines() {
+    for (let i = 0; i < particles.length; i++) {
+      const dx = particles[i].x - mouse.x;
+      const dy = particles[i].y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < mouse.radius * 1.5) {
+        const alpha = (1 - dist / (mouse.radius * 1.5)) * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(mouse.x, mouse.y);
+        ctx.lineTo(particles[i].x, particles[i].y);
+        ctx.strokeStyle = `rgba(255, 51, 153, ${alpha})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, W, H);
+
+    // remove dead burst particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      if (particles[i].burst && particles[i].life <= 0) particles.splice(i, 1);
+    }
+
+    for (const p of particles) { p.update(); p.draw(); }
+    drawConnections();
+    drawMouseLines();
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // track mouse
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+  window.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  // click burst
+  canvas.addEventListener('click', e => {
+    for (let i = 0; i < BURST_COUNT; i++) {
+      particles.push(new Particle(e.clientX, e.clientY, true));
+    }
+  });
+
+  // touch support
+  canvas.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    mouse.x = t.clientX;
+    mouse.y = t.clientY;
+  }, { passive: true });
+  canvas.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    for (let i = 0; i < BURST_COUNT; i++) {
+      particles.push(new Particle(t.clientX, t.clientY, true));
+    }
+  }, { passive: true });
+  canvas.addEventListener('touchend', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+})();
+
+</script>
+</body>
+</html>
