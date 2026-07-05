@@ -315,6 +315,44 @@ section.soft { background: var(--bg-soft); }
 .more-repos a.chip:hover { border-color: var(--go-blue); color: var(--go-dark); }
 .more-repos a.all { color: var(--go-dark); font-weight: 600; }
 
+/* ── FEATURED PROJECT ── */
+.featured {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 1.6rem;
+  background: #fff; border: 1.5px solid var(--go-blue); border-radius: var(--radius);
+  overflow: hidden; box-shadow: 0 20px 48px -24px rgba(0,125,156,0.4);
+}
+.featured-body { padding: 1.8rem; display: flex; flex-direction: column; }
+.featured-flag {
+  align-self: flex-start; font-family: 'JetBrains Mono', monospace; font-size: 0.66rem;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #fff;
+  background: var(--go-blue); border-radius: 999px; padding: 0.2rem 0.7rem; margin-bottom: 0.9rem;
+}
+.featured-body h3 { font-weight: 800; font-size: 2rem; letter-spacing: -0.01em; color: var(--go-dark); margin-bottom: 0.15rem; }
+.featured-body .tagline { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--gray); margin-bottom: 0.9rem; }
+.featured-body p { font-size: 0.95rem; color: var(--gray); margin-bottom: 1rem; }
+.featured-feats { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem; }
+.featured-feats li { font-size: 0.9rem; color: var(--ink); display: flex; gap: 0.6rem; align-items: baseline; }
+.featured-feats li::before { content: '✓'; color: var(--node); font-weight: 700; }
+.featured-body .repo-link {
+  align-self: flex-start; margin-top: auto; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem; font-weight: 600; color: var(--go-dark);
+  border-bottom: 2px solid var(--go-blue); padding-bottom: 1px;
+}
+.featured-body .repo-link:hover { color: var(--go-blue); }
+.featured-term {
+  background: var(--navy); font-family: 'JetBrains Mono', monospace;
+  display: flex; flex-direction: column;
+}
+.featured-term .pg-bar { border-radius: 0; }
+.featured-term .term-body {
+  padding: 1.1rem 1.25rem; font-size: 0.76rem; line-height: 1.85; color: #C9DCE5;
+  white-space: pre; overflow-x: auto; flex: 1;
+}
+.featured-term .term-body .dim { color: #5E7887; }
+.featured-term .term-body .cy { color: var(--lt-blue); }
+.featured-term .term-body .gn { color: #8FD88A; }
+.featured-term .term-body .ye { color: var(--yellow); }
+
 /* ── AI ── */
 .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
 .ai-card {
@@ -369,6 +407,7 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
   .hero-grid { grid-template-columns: 1fr; gap: 2.25rem; }
   .stats-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
   .pin-grid { grid-template-columns: 1fr 1fr; }
+  .featured { grid-template-columns: 1fr; }
   .case-grid { grid-template-columns: 1fr; }
   .decisions { grid-template-columns: 1fr; }
   .nav-links { display: none; }
@@ -439,7 +478,7 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
 <div class="stats">
   <div class="stats-inner">
     <div class="stat"><span class="stat-val">12</span><span class="stat-key">years of engineering</span></div>
-    <div class="stat"><span class="stat-val">94</span><span class="stat-key">public repositories</span></div>
+    <div class="stat"><span class="stat-val">95</span><span class="stat-key">public repositories</span></div>
     <div class="stat"><span class="stat-val">100+</span><span class="stat-key">projects shipped</span></div>
     <div class="stat"><span class="stat-val">∞</span><span class="stat-key">stacks, AI-leveraged</span></div>
   </div>
@@ -716,8 +755,40 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
 <section id="pinned" class="soft">
   <div class="container">
     <div class="sec-label reveal">// pinned on github</div>
-    <h2 class="sec-heading reveal">Six that earn the pin</h2>
-    <p class="sec-sub reveal">Scanned from 94 public repositories — four Go (one of them teaches it), two C++. The AI work gets its own section below.</p>
+    <h2 class="sec-heading reveal">Fresh off the compiler</h2>
+    <p class="sec-sub reveal">Newest build first, then the six pinned to my profile — four Go (one of them teaches it), two C++. The AI work gets its own section below.</p>
+
+    <div class="featured reveal">
+      <div class="featured-body">
+        <span class="featured-flag">Latest · shipped this week</span>
+        <h3>llmcat</h3>
+        <div class="tagline">cat, but for LLMs</div>
+        <p>Packs an entire codebase into one clean, LLM-ready file — annotated file tree plus every source file fenced — so you can hand a whole repo to Claude in a single paste. Pure Go standard library, zero dependencies, one static binary.</p>
+        <ul class="featured-feats">
+          <li>Real <code>.gitignore</code> matcher — globs, negation, anchoring</li>
+          <li>Token estimates per file, so you see the budget before you spend it</li>
+          <li>Concurrent reads, binary detection, tested</li>
+        </ul>
+        <a class="repo-link" href="https://github.com/devthedeveloper/llmcat" target="_blank" rel="noopener">github.com/devthedeveloper/llmcat ↗</a>
+      </div>
+      <div class="featured-term">
+        <div class="pg-bar">
+          <div class="pg-dots"><span></span><span></span><span></span></div>
+          <span class="pg-file">zsh</span>
+        </div>
+        <div class="term-body"><span class="dim"># pack this repo onto your clipboard</span>
+<span class="gn">$</span> llmcat . | pbcopy
+<span class="dim">llmcat: packed 7 files (~4.6k tokens)</span>
+
+<span class="dim"># or just the Go files, tree only</span>
+<span class="gn">$</span> llmcat <span class="cy">-tree -ext</span> .go .
+<span class="ye"># myapp</span>
+├── main.go  <span class="dim">(~1.5k tokens)</span>
+└── store/
+    ├── db.go  <span class="dim">(~410 tokens)</span>
+    └── db_test.go  <span class="dim">(~180 tokens)</span></div>
+      </div>
+    </div>
 
     <div class="pin-grid">
       <a class="repo reveal" href="https://github.com/devthedeveloper/mcpgen" target="_blank" rel="noopener">
