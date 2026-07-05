@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhruv Gupta — Problem Solver · Backend & Full-Stack · Go / C++ / Node.js</title>
+<meta name="description" content="Problem solver first. Backend developer, software engineer, full-stack all-rounder. Go is the love, C++ the fantasy, Node.js the proven years — and with AI leverage, any stack you run.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* Go brand palette */
+  --go-blue:   #00ADD8;
+  --go-dark:   #007D9C;
+  --lt-blue:   #5DC9E2;
+  --aqua:      #00A29C;
+  --fuchsia:   #CE3262;
+  --yellow:    #FDDD00;
+  --node:      #539E43;
+  --cpp:       #F34B7D;
+  --py:        #3572A5;
+  --navy:      #172A33;
+  --navy-2:    #1E3641;
+  --ink:       #1B2B34;
+  --gray:      #4E6270;
+  --bg:        #FFFFFF;
+  --bg-soft:   #EAF7FB;
+  --line:      #D6E4EA;
+  --radius:    10px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Work Sans', -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--go-blue); color: #fff; }
+:focus-visible { outline: 3px solid var(--go-blue); outline-offset: 2px; }
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 2rem;
+  height: 60px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.02rem; }
+.nav-logo .fn { color: var(--go-dark); }
+.nav-logo .paren { color: var(--gray); }
+.nav-links { display: flex; gap: 0.2rem; list-style: none; }
+.nav-links a {
+  font-size: 0.92rem; font-weight: 500; color: var(--gray);
+  padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.15s;
+}
+.nav-links a:hover { color: var(--go-dark); background: var(--bg-soft); }
+
+/* ── HERO ── */
+.hero { padding: 4.5rem 0 4rem; }
+.hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 3rem; align-items: center; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 0.85rem; font-weight: 600; color: var(--go-dark);
+  background: var(--bg-soft); border: 1px solid #BEE3EF;
+  padding: 0.3rem 0.85rem; border-radius: 999px; margin-bottom: 1.4rem;
+}
+.hero-badge::before {
+  content: ''; width: 8px; height: 8px; background: var(--node);
+  border-radius: 50%; box-shadow: 0 0 0 3px rgba(83,158,67,0.2);
+}
+.hero h1 {
+  font-weight: 800; font-size: clamp(2.6rem, 5.5vw, 4rem);
+  line-height: 1.04; letter-spacing: -0.02em; margin-bottom: 1.25rem;
+}
+.hero h1 .blue { color: var(--go-blue); }
+.hero-sub { font-size: 1.08rem; color: var(--gray); margin-bottom: 1.9rem; max-width: 520px; }
+.hero-sub strong { color: var(--ink); font-weight: 600; }
+.hero-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: inherit; font-size: 0.95rem; font-weight: 600;
+  padding: 0.72rem 1.5rem; border-radius: 8px; border: 2px solid transparent;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-primary { background: var(--go-blue); color: #fff; }
+.btn-primary:hover { background: var(--go-dark); }
+.btn-ghost { border-color: var(--line); color: var(--ink); background: #fff; }
+.btn-ghost:hover { border-color: var(--go-blue); color: var(--go-dark); }
+
+/* ── PLAYGROUND WINDOW ── */
+.playground {
+  background: var(--navy); border-radius: var(--radius);
+  box-shadow: 0 24px 60px -24px rgba(23,42,51,0.5);
+  overflow: hidden; font-family: 'JetBrains Mono', monospace;
+}
+.pg-bar {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: var(--navy-2); padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.pg-dots { display: flex; gap: 6px; }
+.pg-dots span { width: 11px; height: 11px; border-radius: 50%; }
+.pg-dots span:nth-child(1) { background: #FF5F57; }
+.pg-dots span:nth-child(2) { background: var(--yellow); }
+.pg-dots span:nth-child(3) { background: var(--node); }
+.pg-file { font-size: 0.78rem; color: #8FA6B2; }
+.pg-run {
+  margin-left: auto; font-family: inherit; font-size: 0.75rem; font-weight: 600;
+  background: var(--go-blue); color: #fff; border: none; border-radius: 5px;
+  padding: 0.3rem 0.9rem; cursor: pointer; transition: background 0.15s;
+}
+.pg-run:hover { background: var(--lt-blue); color: var(--navy); }
+.pg-code { padding: 1.1rem 1.25rem; font-size: 0.8rem; line-height: 1.75; color: #D4E3EB; overflow-x: auto; white-space: pre; }
+.pg-code .kw  { color: var(--fuchsia); }
+.pg-code .fn  { color: var(--lt-blue); }
+.pg-code .str { color: #8FD88A; }
+.pg-code .cm  { color: #5E7887; font-style: italic; }
+.pg-code .ty  { color: var(--yellow); }
+.pg-out {
+  border-top: 1px solid rgba(255,255,255,0.09);
+  background: #10212A; padding: 0.9rem 1.25rem;
+  font-size: 0.78rem; line-height: 1.8; min-height: 172px; color: #C9DCE5;
+  white-space: pre-wrap; overflow-x: auto;
+}
+.pg-out .ok { color: #8FD88A; }
+.pg-out .dim { color: #5E7887; }
+.pg-out .cur { display: inline-block; width: 8px; height: 14px; background: var(--go-blue); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── STATS STRIP ── */
+.stats { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--bg-soft); }
+.stats-inner {
+  max-width: 1100px; margin: 0 auto; padding: 1.4rem 2rem;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+}
+.stat { display: flex; flex-direction: column; }
+.stat-val { font-weight: 800; font-size: 2rem; line-height: 1.1; color: var(--go-dark); }
+.stat-key { font-size: 0.82rem; color: var(--gray); font-weight: 500; }
+
+/* ── SECTIONS ── */
+section { padding: 4.5rem 0; }
+section.soft { background: var(--bg-soft); }
+.sec-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
+  color: var(--go-dark); margin-bottom: 0.6rem;
+}
+.sec-heading {
+  font-weight: 800; font-size: clamp(1.9rem, 4vw, 2.7rem);
+  letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 0.7rem;
+}
+.sec-sub { font-size: 1rem; color: var(--gray); max-width: 640px; margin-bottom: 2.25rem; }
+
+/* ── WATCH ME WORK ── */
+.work-block { margin-bottom: 4rem; }
+.work-block:last-child { margin-bottom: 0; }
+.wb-head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.5rem; }
+.wb-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600;
+  color: var(--go-dark); background: var(--bg-soft); border: 1px solid #BEE3EF;
+  border-radius: 999px; padding: 0.14rem 0.7rem;
+}
+.wb-title { font-weight: 700; font-size: 1.45rem; letter-spacing: -0.01em; }
+.wb-sub { color: var(--gray); font-size: 0.95rem; max-width: 660px; margin-bottom: 1.4rem; }
+.brief { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+.brief .pill { background: #fff; }
+.brief .pill.req { border-color: rgba(206,50,98,0.4); color: var(--fuchsia); font-weight: 600; }
+
+.arch-card {
+  background: var(--navy); border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 24px 60px -24px rgba(23,42,51,0.5);
+}
+.arch-scroll { overflow-x: auto; }
+.arch-scroll svg { display: block; min-width: 880px; width: 100%; height: auto; }
+
+.decisions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; margin-top: 1.5rem; }
+.decision { display: flex; gap: 0.75rem; font-size: 0.92rem; color: var(--gray); }
+.decision .dn {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; margin-top: 2px;
+  background: var(--fuchsia); color: #fff; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; justify-content: center;
+}
+.decision b { color: var(--ink); font-weight: 600; }
+
+.metrics { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
+.metric {
+  background: var(--bg-soft); border: 1px solid #BEE3EF; border-radius: 8px;
+  padding: 0.5rem 1rem; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem; font-weight: 600; color: var(--go-dark);
+}
+.metric .from { color: var(--gray); text-decoration: line-through; font-weight: 400; }
+
+.case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+.case {
+  background: var(--navy); border-radius: var(--radius); overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: 0 18px 44px -22px rgba(23,42,51,0.5);
+  display: flex; flex-direction: column;
+}
+.case-bar {
+  background: var(--navy-2); padding: 0.55rem 1rem; font-size: 0.72rem; color: #8FA6B2;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.tag { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; font-weight: 600; padding: 0.12rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+.case-bar .tag { margin-left: auto; }
+.tag.bad  { background: rgba(255,95,87,0.16); color: #FF7B72; }
+.tag.mid  { background: rgba(253,221,0,0.14); color: var(--yellow); }
+.tag.good { background: rgba(83,158,67,0.22); color: #8FD88A; }
+.case-body {
+  padding: 1rem 1.1rem; font-size: 0.73rem; line-height: 1.8; color: #C9DCE5;
+  white-space: pre-wrap; overflow-x: auto; flex: 1;
+}
+.case-body .dim { color: #5E7887; }
+.case-body .bad { color: #FF7B72; }
+.case-body .good { color: #8FD88A; }
+.case-body .cy { color: var(--lt-blue); }
+.dl-del { display: block; background: rgba(255,95,87,0.09); color: #FF9B93; }
+.dl-add { display: block; background: rgba(83,158,67,0.14); color: #9FE09A; }
+
+@media (prefers-reduced-motion: reduce) { .flowdots { display: none; } }
+
+/* ── STACK CARDS ── */
+.stack-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.1rem; }
+.lang {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.6rem; position: relative; overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.lang:hover { transform: translateY(-3px); box-shadow: 0 16px 36px -20px rgba(23,42,51,0.35); }
+.lang::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+.lang.go::before   { background: var(--go-blue); }
+.lang.cpp::before  { background: var(--cpp); }
+.lang.node::before { background: var(--node); }
+.lang.any::before  { background: linear-gradient(90deg, var(--go-blue), var(--aqua), var(--yellow), var(--fuchsia)); }
+.lang-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.7rem; }
+.lang h3 { font-weight: 700; font-size: 1.45rem; letter-spacing: -0.01em; }
+.lang.go h3 { color: var(--go-dark); }
+.lang-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
+  padding: 0.2rem 0.6rem; border-radius: 999px;
+}
+.lang.go   .lang-tag { background: rgba(0,173,216,0.12); color: var(--go-dark); }
+.lang.cpp  .lang-tag { background: rgba(243,75,125,0.1); color: var(--cpp); }
+.lang.node .lang-tag { background: rgba(83,158,67,0.12); color: var(--node); }
+.lang.any  .lang-tag { background: rgba(253,221,0,0.25); color: #8a7500; }
+.lang p { font-size: 0.94rem; color: var(--gray); margin-bottom: 1rem; }
+.lang p strong { color: var(--ink); font-weight: 600; }
+.pills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500;
+  padding: 0.2rem 0.6rem; border: 1px solid var(--line); border-radius: 999px; color: var(--gray);
+  background: #fff;
+}
+
+/* ── ROLES ── */
+.roles-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.1rem; }
+.role {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.role:hover { transform: translateY(-3px); box-shadow: 0 16px 36px -20px rgba(23,42,51,0.35); }
+.role-icon {
+  width: 40px; height: 40px; border-radius: 9px; background: var(--bg-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem;
+  color: var(--go-dark); margin-bottom: 0.9rem;
+}
+.role h3 { font-weight: 700; font-size: 1.12rem; margin-bottom: 0.35rem; }
+.role p { font-size: 0.92rem; color: var(--gray); }
+
+/* ── PINNED REPOS ── */
+.pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+.repo {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.55rem;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.repo:hover { transform: translateY(-3px); border-color: var(--go-blue); box-shadow: 0 16px 36px -20px rgba(23,42,51,0.35); }
+.repo-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.repo-name { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.95rem; word-break: break-all; }
+.repo:hover .repo-name { color: var(--go-dark); }
+.repo-pin {
+  flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--go-dark);
+  background: var(--bg-soft); border-radius: 999px; padding: 0.14rem 0.55rem;
+}
+.repo-desc { font-size: 0.88rem; color: var(--gray); flex: 1; }
+.repo-meta { display: flex; align-items: center; gap: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--gray); }
+.lang-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 0.35rem; vertical-align: -1px; }
+.more-repos {
+  margin-top: 1.5rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  font-size: 0.85rem; color: var(--gray);
+}
+.more-repos a.chip {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+  border: 1px solid var(--line); border-radius: 999px; padding: 0.2rem 0.7rem;
+  background: #fff; transition: all 0.15s;
+}
+.more-repos a.chip:hover { border-color: var(--go-blue); color: var(--go-dark); }
+.more-repos a.all { color: var(--go-dark); font-weight: 600; }
+
+/* ── AI ── */
+.ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+.ai-card {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ai-card:hover { transform: translateY(-3px); box-shadow: 0 16px 36px -20px rgba(23,42,51,0.35); }
+.ai-card.wide { grid-column: 1 / -1; }
+.ai-card h3 { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.4rem; }
+.ai-card p { font-size: 0.93rem; color: var(--gray); margin-bottom: 0.9rem; }
+.pill.hl { border-color: rgba(0,173,216,0.5); color: var(--go-dark); background: var(--bg-soft); }
+
+/* ── TIMELINE ── */
+.timeline-item {
+  display: grid; grid-template-columns: 165px 1fr; gap: 2rem;
+  padding: 1.25rem 0; border-bottom: 1px solid var(--line);
+}
+.timeline-item:last-child { border-bottom: none; }
+.timeline-year { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; color: var(--go-dark); padding-top: 0.2rem; }
+.timeline-content h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem; }
+.timeline-content p { font-size: 0.92rem; color: var(--gray); }
+
+/* ── CONTACT (navy band) ── */
+.contact { background: var(--navy); color: #E8F2F7; }
+.contact .sec-label { color: var(--lt-blue); }
+.contact .sec-heading { color: #fff; }
+.contact p.lead { font-size: 1.05rem; color: #A8C2CF; max-width: 560px; margin-bottom: 1.9rem; }
+.contact .btn-ghost { background: transparent; border-color: #3A5563; color: #E8F2F7; }
+.contact .btn-ghost:hover { border-color: var(--go-blue); color: var(--lt-blue); }
+
+footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); }
+.ft-inner {
+  max-width: 1100px; margin: 0 auto; padding: 1.2rem 2rem;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+  font-size: 0.82rem; color: #7E99A7;
+}
+.ft-inner a:hover { color: var(--lt-blue); }
+.ft-inner .mono { font-size: 0.75rem; }
+
+/* ── REVEAL ── */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .pg-out .cur { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 920px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 2.25rem; }
+  .stats-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .pin-grid { grid-template-columns: 1fr 1fr; }
+  .case-grid { grid-template-columns: 1fr; }
+  .decisions { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+}
+@media (max-width: 620px) {
+  .stack-grid, .roles-grid, .pin-grid, .ai-grid, .case-grid { grid-template-columns: 1fr; }
+  .timeline-item { grid-template-columns: 1fr; gap: 0.3rem; }
+  .container, .nav-inner, .stats-inner, .ft-inner { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .hero { padding: 3rem 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#top"><span class="fn">dhruv</span><span class="paren">.</span><span class="fn">Solve</span><span class="paren">(problem)</span></a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#roles">Roles</a></li>
+      <li><a href="#pinned">Pinned</a></li>
+      <li><a href="#ai">AI</a></li>
+      <li><a href="#record">Record</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-badge">Available for projects · remote, worldwide</div>
+        <h1>Problem solver first.<br>Everything else is <span class="blue">syntax</span>.</h1>
+        <p class="hero-sub">Backend developer, software engineer, full-stack when the product needs it — an <strong>all-rounder</strong> with 12 years of shipping. <strong>Go</strong> is the love of my life, <strong>C++</strong> the fantasy I'd jump at, <strong>Node.js</strong> put in the years — and with AI leverage, I'll meet you in whatever stack you run.</p>
+        <div class="hero-btns">
+          <a class="btn btn-primary" href="#contact">Bring me a problem</a>
+          <a class="btn btn-ghost" href="https://github.com/devthedeveloper" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+
+      <div class="playground">
+        <div class="pg-bar">
+          <div class="pg-dots"><span></span><span></span><span></span></div>
+          <span class="pg-file">dhruv.go</span>
+          <button class="pg-run" id="runBtn" type="button">Run ▶</button>
+        </div>
+        <div class="pg-code"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="str">"problems"</span>
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    dhruv := <span class="ty">Engineer</span>{<span class="fn">Years</span>: <span class="ty">12</span>}
+    <span class="kw">for</span> problem := <span class="kw">range</span> problems.<span class="fn">Incoming</span>() {
+        dhruv.<span class="fn">Solve</span>(problem) <span class="cm">// whatever it takes</span>
+    }
+}</div>
+        <div class="pg-out" id="pgOut"><span class="dim">$ go run dhruv.go</span><br><span class="cur"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-val">12</span><span class="stat-key">years of engineering</span></div>
+    <div class="stat"><span class="stat-val">94</span><span class="stat-key">public repositories</span></div>
+    <div class="stat"><span class="stat-val">100+</span><span class="stat-key">projects shipped</span></div>
+    <div class="stat"><span class="stat-val">∞</span><span class="stat-key">stacks, AI-leveraged</span></div>
+  </div>
+</div>
+
+<!-- WATCH ME WORK -->
+<section id="work">
+  <div class="container">
+    <div class="sec-label reveal">// watch me work</div>
+    <h2 class="sec-heading reveal">Don't take my word for it</h2>
+    <p class="sec-sub reveal">Two things clients actually pay for: designing systems that hold, and making problems disappear. Here's the shape of both — patterns from real engagements.</p>
+
+    <!-- 01 · THE ARCHITECT -->
+    <div class="work-block">
+      <div class="wb-head reveal"><span class="wb-num">01 · the architect</span><span class="wb-title">A system that can't drop an order</span></div>
+      <p class="wb-sub reveal">The brief every e-commerce backend eventually faces — and the design I reach for. Watch an order travel through it.</p>
+      <div class="brief reveal">
+        <span class="pill req">2M orders/day</span>
+        <span class="pill req">20× traffic spikes</span>
+        <span class="pill req">payments involved</span>
+        <span class="pill req">99.95% uptime</span>
+        <span class="pill req">zero lost orders</span>
+      </div>
+
+      <div class="arch-card reveal">
+        <div class="pg-bar">
+          <div class="pg-dots"><span></span><span></span><span></span></div>
+          <span class="pg-file">orders-platform · system design</span>
+          <span class="tag good" style="margin-left:auto">shipped ✓</span>
+        </div>
+        <div class="arch-scroll">
+        <svg viewBox="0 0 960 570" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace" role="img" aria-label="System design diagram: clients through API gateway and order service to PostgreSQL with outbox, Kafka event bus, and workers with dead-letter queue">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#56707E"/>
+            </marker>
+            <path id="flowpath" d="M140,152 L735,152 L735,324 L280,324 L280,436" fill="none"/>
+          </defs>
+
+          <!-- clients -->
+          <rect x="24" y="80" width="110" height="40" rx="7" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="79" y="105" text-anchor="middle" fill="#C9DCE5" font-size="12">web</text>
+          <rect x="24" y="132" width="110" height="40" rx="7" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="79" y="157" text-anchor="middle" fill="#C9DCE5" font-size="12">mobile</text>
+          <rect x="24" y="184" width="110" height="40" rx="7" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="79" y="209" text-anchor="middle" fill="#C9DCE5" font-size="12">partners</text>
+
+          <!-- gateway -->
+          <rect x="190" y="110" width="170" height="84" rx="8" fill="#1E3641" stroke="#00ADD8" stroke-width="1.5"/>
+          <text x="275" y="140" text-anchor="middle" fill="#5DC9E2" font-size="13" font-weight="600">API GATEWAY · Go</text>
+          <text x="275" y="160" text-anchor="middle" fill="#7E99A7" font-size="10.5">auth · rate-limit</text>
+          <text x="275" y="176" text-anchor="middle" fill="#7E99A7" font-size="10.5">idempotency keys</text>
+          <circle cx="360" cy="110" r="11" fill="#CE3262"/>
+          <text x="360" y="114.5" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">1</text>
+
+          <!-- order service -->
+          <rect x="420" y="110" width="170" height="84" rx="8" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="505" y="140" text-anchor="middle" fill="#C9DCE5" font-size="13" font-weight="600">ORDER SERVICE · Go</text>
+          <text x="505" y="160" text-anchor="middle" fill="#7E99A7" font-size="10.5">stateless</text>
+          <text x="505" y="176" text-anchor="middle" fill="#7E99A7" font-size="10.5">scales horizontally</text>
+
+          <!-- postgres -->
+          <rect x="650" y="84" width="170" height="64" rx="8" fill="#1E3641" stroke="#FDDD00" stroke-width="1.5"/>
+          <text x="735" y="110" text-anchor="middle" fill="#FDDD00" font-size="13" font-weight="600">POSTGRESQL</text>
+          <text x="735" y="130" text-anchor="middle" fill="#7E99A7" font-size="10.5">orders + outbox table</text>
+          <circle cx="820" cy="84" r="11" fill="#CE3262"/>
+          <text x="820" y="88.5" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">2</text>
+
+          <!-- redis -->
+          <rect x="650" y="172" width="170" height="48" rx="8" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="735" y="192" text-anchor="middle" fill="#C9DCE5" font-size="12" font-weight="600">REDIS</text>
+          <text x="735" y="208" text-anchor="middle" fill="#7E99A7" font-size="10.5">hot reads · ~1ms</text>
+
+          <!-- kafka bus -->
+          <rect x="190" y="300" width="630" height="48" rx="8" fill="#12303C" stroke="#00A29C" stroke-width="1.5"/>
+          <text x="212" y="329" fill="#00A29C" font-size="13" font-weight="600">KAFKA EVENT BUS</text>
+          <text x="798" y="329" text-anchor="end" fill="#7E99A7" font-size="10.5">at-least-once · keyed by order_id</text>
+
+          <!-- workers -->
+          <rect x="190" y="400" width="180" height="72" rx="8" fill="#1E3641" stroke="#539E43" stroke-width="1.5"/>
+          <text x="280" y="428" text-anchor="middle" fill="#8FD88A" font-size="12.5" font-weight="600">PAYMENTS WORKER</text>
+          <text x="280" y="448" text-anchor="middle" fill="#7E99A7" font-size="10.5">retries · circuit breaker</text>
+          <circle cx="370" cy="400" r="11" fill="#CE3262"/>
+          <text x="370" y="404.5" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">3</text>
+
+          <rect x="410" y="400" width="180" height="72" rx="8" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="500" y="428" text-anchor="middle" fill="#C9DCE5" font-size="12.5" font-weight="600">INVENTORY WORKER</text>
+          <text x="500" y="448" text-anchor="middle" fill="#7E99A7" font-size="10.5">reserve · release</text>
+
+          <rect x="630" y="400" width="190" height="72" rx="8" fill="#1E3641" stroke="#3A5563" stroke-width="1.5"/>
+          <text x="725" y="428" text-anchor="middle" fill="#C9DCE5" font-size="12.5" font-weight="600">NOTIFICATIONS</text>
+          <text x="725" y="448" text-anchor="middle" fill="#7E99A7" font-size="10.5">email · webhooks</text>
+
+          <!-- DLQ -->
+          <rect x="190" y="504" width="180" height="42" rx="8" fill="#1E3641" stroke="#CE3262" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="280" y="530" text-anchor="middle" fill="#E88BA5" font-size="11.5">DLQ → inspect → replay</text>
+
+          <!-- observability -->
+          <rect x="450" y="504" width="370" height="42" rx="8" fill="#12303C" stroke="#5DC9E2" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="635" y="530" text-anchor="middle" fill="#5DC9E2" font-size="11.5">OBSERVABILITY — metrics · traces · SLO alerts</text>
+          <circle cx="820" cy="504" r="11" fill="#CE3262"/>
+          <text x="820" y="508.5" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">4</text>
+
+          <!-- arrows -->
+          <g stroke="#56707E" stroke-width="1.5" fill="none">
+            <line x1="134" y1="100" x2="186" y2="134" marker-end="url(#arr)"/>
+            <line x1="134" y1="152" x2="186" y2="152" marker-end="url(#arr)"/>
+            <line x1="134" y1="204" x2="186" y2="170" marker-end="url(#arr)"/>
+            <line x1="360" y1="152" x2="416" y2="152" marker-end="url(#arr)"/>
+            <line x1="590" y1="134" x2="646" y2="116" marker-end="url(#arr)"/>
+            <line x1="590" y1="170" x2="646" y2="192" marker-end="url(#arr)"/>
+            <line x1="735" y1="148" x2="735" y2="296" marker-end="url(#arr)"/>
+            <line x1="280" y1="348" x2="280" y2="396" marker-end="url(#arr)"/>
+            <line x1="500" y1="348" x2="500" y2="396" marker-end="url(#arr)"/>
+            <line x1="725" y1="348" x2="725" y2="396" marker-end="url(#arr)"/>
+            <line x1="280" y1="472" x2="280" y2="500" marker-end="url(#arr)"/>
+          </g>
+          <text x="748" y="230" fill="#7E99A7" font-size="10.5">outbox relay</text>
+          <text x="290" y="490" fill="#7E99A7" font-size="10.5">poison msgs</text>
+
+          <!-- animated order flowing through -->
+          <g class="flowdots">
+            <circle r="5" fill="#00ADD8">
+              <animateMotion dur="7s" repeatCount="indefinite" rotate="0">
+                <mpath href="#flowpath"/>
+              </animateMotion>
+            </circle>
+            <circle r="5" fill="#00ADD8" opacity="0.6">
+              <animateMotion dur="7s" begin="3.5s" repeatCount="indefinite" rotate="0">
+                <mpath href="#flowpath"/>
+              </animateMotion>
+            </circle>
+          </g>
+        </svg>
+        </div>
+      </div>
+
+      <div class="decisions">
+        <div class="decision reveal"><span class="dn">1</span><span><b>Idempotency at the edge.</b> Clients retry, networks flake — the same order submitted twice must charge once. Solved before it ever reaches business logic.</span></div>
+        <div class="decision reveal"><span class="dn">2</span><span><b>Outbox pattern.</b> The order row and its event commit in one transaction — no dual-write problem, no order that exists in the DB but never got processed.</span></div>
+        <div class="decision reveal"><span class="dn">3</span><span><b>Failure is a feature.</b> Payment provider down? Retries with backoff, circuit breaker, and a dead-letter queue you can inspect and replay — not a 3am mystery.</span></div>
+        <div class="decision reveal"><span class="dn">4</span><span><b>Observable from day one.</b> SLOs, traces and alerts designed with the system, not bolted on after the first outage.</span></div>
+      </div>
+
+      <div class="metrics reveal">
+        <span class="metric">2M+ orders/day</span>
+        <span class="metric">p99 120ms</span>
+        <span class="metric">20× spikes absorbed by the bus</span>
+        <span class="metric">orders lost: 0</span>
+      </div>
+    </div>
+
+    <!-- 02 · THE FIX -->
+    <div class="work-block">
+      <div class="wb-head reveal"><span class="wb-num">02 · the fix</span><span class="wb-title">Handed a fire, returned six lines</span></div>
+      <p class="wb-sub reveal">Finding the real cause is the job — the fix should look easy. A classic engagement, start to finish:</p>
+
+      <div class="case-grid">
+        <div class="case reveal">
+          <div class="case-bar">the symptom <span class="tag bad">prod · on fire</span></div>
+          <div class="case-body"><span class="dim">$</span> curl -w '%{time_total}' \
+   -o /dev/null -s /api/orders
+<span class="bad">8.412s</span>
+
+<span class="dim">p99 latency</span>   <span class="bad">8.4s</span>
+<span class="dim">timeouts</span>      <span class="bad">3.1%</span>
+<span class="dim">pager</span>         <span class="bad">screaming</span></div>
+        </div>
+
+        <div class="case reveal">
+          <div class="case-bar">the diagnosis <span class="tag mid">root cause</span></div>
+          <div class="case-body"><span class="dim">$</span> go tool pprof -top cpu.out
+<span class="cy">92%</span> sql.(*DB).QueryContext
+<span class="dim">→ one query per order. N+1.</span>
+
+<span class="dim">$</span> EXPLAIN ANALYZE SELECT ...
+<span class="bad">Seq Scan</span> on orders
+<span class="dim">→ and no index either.</span></div>
+        </div>
+
+        <div class="case reveal">
+          <div class="case-bar">the fix <span class="tag good">6 lines</span></div>
+          <div class="case-body"><span class="dl-del">- for _, id := range ids {</span><span class="dl-del">-   o, _ := db.GetOrder(ctx, id)</span><span class="dl-del">-   out = append(out, o)</span><span class="dl-del">- }</span><span class="dl-add">+ out, _ := db.GetOrders(ctx, ids)</span>
+<span class="dl-add">+ CREATE INDEX CONCURRENTLY</span><span class="dl-add">+   ON orders (customer_id);</span></div>
+        </div>
+      </div>
+
+      <div class="metrics reveal">
+        <span class="metric"><span class="from">p99 8.4s</span> → 90ms</span>
+        <span class="metric"><span class="from">timeouts 3.1%</span> → 0</span>
+        <span class="metric">lines changed: 6</span>
+        <span class="metric">time to fix: one afternoon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack" class="soft">
+  <div class="container">
+    <div class="sec-label reveal">// the stack, honestly</div>
+    <h2 class="sec-heading reveal">Three languages, three relationships</h2>
+    <p class="sec-sub reveal">Most portfolios list twenty logos. Here's the truth instead — what I love, what I dream about, what I've proven — and why the rest doesn't scare me.</p>
+
+    <div class="stack-grid">
+      <div class="lang go reveal">
+        <div class="lang-head"><h3>Go</h3><span class="lang-tag">the love — lifetime</span></div>
+        <p>The language I want to grow old with. APIs, CLIs, agents, pipelines — <strong>single binaries, no ceremony</strong>. Nine public Go repos and counting; if the choice is mine, it's Go.</p>
+        <div class="pills">
+          <span class="pill">Gin / Echo / Fiber</span><span class="pill">gRPC</span><span class="pill">goroutines &amp; channels</span><span class="pill">PostgreSQL</span><span class="pill">Redis</span>
+        </div>
+      </div>
+
+      <div class="lang cpp reveal">
+        <div class="lang-head"><h3>C++</h3><span class="lang-tag">the fantasy</span></div>
+        <p>The opportunity I'd jump at. Performance work close to the metal — scanners, parsers, engines. I build my own C++ tools to stay sharp; <strong>give me an excuse to write more</strong>.</p>
+        <div class="pills">
+          <span class="pill">modern C++</span><span class="pill">STL</span><span class="pill">RAII</span><span class="pill">systems tooling</span>
+        </div>
+      </div>
+
+      <div class="lang node reveal">
+        <div class="lang-head"><h3>Node.js</h3><span class="lang-tag">the proven years</span></div>
+        <p>Where I put in years of production work — <strong>REST APIs, real-time services, e-commerce backends</strong>. Express to NestJS, callbacks to async/await, I lived the whole era.</p>
+        <div class="pills">
+          <span class="pill">Express / Fastify</span><span class="pill">NestJS</span><span class="pill">TypeScript</span><span class="pill">WebSockets</span>
+        </div>
+      </div>
+
+      <div class="lang any reveal">
+        <div class="lang-head"><h3>Your stack</h3><span class="lang-tag">AI-leveraged</span></div>
+        <p>Python, TypeScript, Rust, PHP — I've shipped in all of them, and with AI leverage I ramp onto <strong>whatever the problem needs</strong>. The language was never the hard part; the problem is.</p>
+        <div class="pills">
+          <span class="pill">Python</span><span class="pill">TypeScript</span><span class="pill">React / Next.js</span><span class="pill">whatever ships</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section id="roles">
+  <div class="container">
+    <div class="sec-label reveal">// what I actually am</div>
+    <h2 class="sec-heading reveal">One engineer, every hat</h2>
+    <p class="sec-sub reveal">Titles are just entry points. Hand me the problem and I'll wear whichever of these it needs.</p>
+
+    <div class="roles-grid">
+      <div class="role reveal">
+        <div class="role-icon">be</div>
+        <h3>Backend developer</h3>
+        <p>The core. Distributed systems, event-driven architectures, API gateways — systems that process millions of daily transactions without drama.</p>
+      </div>
+      <div class="role reveal">
+        <div class="role-icon">swe</div>
+        <h3>Software engineer</h3>
+        <p>End to end: design, build, test, ship, operate. Production is the only benchmark that counts — everything else is a demo.</p>
+      </div>
+      <div class="role reveal">
+        <div class="role-icon">fs</div>
+        <h3>Full-stack developer</h3>
+        <p>React and Next.js fronts on Go or Node backs — when the product needs one person who owns the whole thing, that's me.</p>
+      </div>
+      <div class="role reveal">
+        <div class="role-icon">all</div>
+        <h3>All-rounder</h3>
+        <p>DevOps, databases, CLIs, AI systems, security-aware engineering from a bug-bounty background. Whatever the gap is, I fill it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PINNED REPOS -->
+<section id="pinned" class="soft">
+  <div class="container">
+    <div class="sec-label reveal">// pinned on github</div>
+    <h2 class="sec-heading reveal">Six that earn the pin</h2>
+    <p class="sec-sub reveal">Scanned from 94 public repositories — four Go (one of them teaches it), two C++. The AI work gets its own section below.</p>
+
+    <div class="pin-grid">
+      <a class="repo reveal" href="https://github.com/devthedeveloper/mcpgen" target="_blank" rel="noopener">
+        <div class="repo-head"><span class="repo-name">mcpgen</span><span class="repo-pin">pinned</span></div>
+        <p class="repo-desc">Turn any API into an MCP server. Single Go binary. Zero config.</p>
+        <div class="repo-meta"><span><span class="lang-dot" style="background:var(--go-blue)"></span>Go</span><span>CLI · MCP</span></div>
+      </a>
+      <a class="repo reveal" href="https://github.com/devthedeveloper/codebase-agent-go" target="_blank" rel="noopener">
+        <div class="repo-head"><span class="repo-name">codebase-agent-go</span><span class="repo-pin">pinned</span></div>
+        <p class="repo-desc">AI-powered codebase onboarding — single binary, zero setup. Understand any repo in minutes.</p>
+        <div class="repo-meta"><span><span class="lang-dot" style="background:var(--go-blue)"></span>Go</span><span>AI · CLI</span></div>
+      </a>
+      <a class="repo reveal" href="https://github.com/devthedeveloper/passgen" target="_blank" rel="noopener">
+        <div class="repo-head"><span class="repo-name">passgen</span><span class="repo-pin">pinned</span></div>
+        <p class="repo-desc">Cryptographically secure CLI password generator for macOS, Linux and Windows.</p>
+        <div class="repo-meta"><span><span class="lang-dot" style="background:var(--go-blue)"></span>Go</span><span>crypto/rand</span></div>
+      </a>
+      <a class="repo reveal" href="https://devthedeveloper.github.io/gocheatsheet/" target="_blank" rel="noopener">
+        <div class="repo-head"><span class="repo-name">gocheatsheet</span><span class="repo-pin">pinned</span></div>
+        <p class="repo-desc">Colorful Go cheat sheet — the syntax you keep forgetting, plus which-one-do-I-use guides. Yes, I teach Go too.</p>
+        <div class="repo-meta"><span><span class="lang-dot" style="background:var(--go-blue)"></span>Go</span><span>live site · teaching</span></div>
+      </a>
+      <a class="repo reveal" href="https://github.com/devthedeveloper/cpp_subdomain_discovery" target="_blank" rel="noopener">
+        <div class="repo-head"><span class="repo-name">cpp_subdomain_discovery</span><span class="repo-pin">pinned</span></div>
+        <p class="repo-desc">Subdomain enumeration tool for network recon, written in C++ for raw speed.</p>
+        <div class="repo-meta"><span><span class="lang-dot" style="background:var(--cpp)"></span>C++</span><span>systems</span></div>
+      </a>
+      <a class="repo reveal" href="https://github.com/devthedeveloper/cpploganalyser" target="_blank" rel="noopener">
+        <div class="repo-head"><span class="repo-name">cpploganalyser</span><span class="repo-pin">pinned</span></div>
+        <p class="repo-desc">Log analysis engine in C++ — parse and crunch large log files without breaking a sweat.</p>
+        <div class="repo-meta"><span><span class="lang-dot" style="background:var(--cpp)"></span>C++</span><span>systems</span></div>
+      </a>
+    </div>
+
+    <div class="more-repos reveal">
+      <span>more Go tools:</span>
+      <a class="chip" href="https://github.com/devthedeveloper/jsfinder" target="_blank" rel="noopener">jsfinder</a>
+      <a class="chip" href="https://github.com/devthedeveloper/api-dispatcher" target="_blank" rel="noopener">api-dispatcher</a>
+      <a class="chip" href="https://github.com/devthedeveloper/mypass" target="_blank" rel="noopener">mypass</a>
+      <a class="chip" href="https://github.com/devthedeveloper/time-tracker" target="_blank" rel="noopener">time-tracker</a>
+      <a class="chip" href="https://github.com/devthedeveloper/datatransform" target="_blank" rel="noopener">datatransform</a>
+      <a class="chip" href="https://github.com/devthedeveloper/golangscreentimetracker" target="_blank" rel="noopener">screentime</a>
+      <a class="all" href="https://github.com/devthedeveloper?tab=repositories" target="_blank" rel="noopener">all 94 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- AI -->
+<section id="ai">
+  <div class="container">
+    <div class="sec-label reveal">// ai leverage</div>
+    <h2 class="sec-heading reveal">AI is my force multiplier</h2>
+    <p class="sec-sub reveal">I build with AI and I build AI — production multi-agent systems with tool access, memory and verification layers, on twelve years of backend that keeps them reliable.</p>
+
+    <div class="ai-grid">
+      <div class="ai-card wide reveal">
+        <h3>AgentForge</h3>
+        <p>AI agent marketplace where clients submit software projects fulfilled by a fleet of specialised autonomous agents — Architect, PM, Backend Dev, Frontend Dev — orchestrated through Claude's API with coin-based billing and human-in-the-loop checkpoints.</p>
+        <div class="pills"><span class="pill hl">Multi-agent orchestration</span><span class="pill hl">Claude API</span><span class="pill">Next.js</span><span class="pill">PostgreSQL</span><span class="pill">Redis</span><span class="pill">Stripe</span></div>
+      </div>
+      <div class="ai-card reveal">
+        <h3>AEGIS</h3>
+        <p>AI-powered threat-modelling CLI — an autonomous agent that reads filesystems, analyses codebases and produces assessments, built on the Claude Agent SDK.</p>
+        <div class="pills"><span class="pill hl">Claude Agent SDK</span><span class="pill">CLI</span></div>
+      </div>
+      <div class="ai-card reveal">
+        <h3>AI ↔ Slack pipeline</h3>
+        <p>Autonomous workflow automation: Claude Code hooks that read transcripts, post to Slack and poll replies back — full human-in-the-loop, headless.</p>
+        <div class="pills"><span class="pill hl">Claude Code hooks</span><span class="pill">Slack API</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECORD -->
+<section id="record" class="soft">
+  <div class="container">
+    <div class="sec-label reveal">// track record</div>
+    <h2 class="sec-heading reveal">Twelve years of shipping</h2>
+
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2024 — now</div>
+        <div class="timeline-content">
+          <h3>Independent — backend, full-stack &amp; AI engineering</h3>
+          <p>Go and C++ tooling, full-stack product builds, multi-agent AI systems in production for clients worldwide.</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2020 — 2024</div>
+        <div class="timeline-content">
+          <h3>Lead Backend Engineer</h3>
+          <p>Led teams building high-throughput distributed systems processing millions of daily transactions. Event-driven architectures and API gateways.</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2017 — 2020</div>
+        <div class="timeline-content">
+          <h3>Senior Software Engineer</h3>
+          <p>Migrated monoliths to microservices. Built real-time data pipelines and CI/CD workflows. Introduced Go to the engineering team — and never looked back.</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2014 — 2017</div>
+        <div class="timeline-content">
+          <h3>Backend Developer</h3>
+          <p>RESTful APIs in Node.js and Python, database schemas, server-side logic — the production years that built the foundation.</p>
+        </div>
+      </div>
+      <div class="timeline-item reveal">
+        <div class="timeline-year">2012 — 2014</div>
+        <div class="timeline-content">
+          <h3>Junior Developer</h3>
+          <p>Wrote code in everything. Learned that production is a different beast.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="container">
+    <div class="sec-label reveal">// contact</div>
+    <h2 class="sec-heading reveal">Got a problem? Good.</h2>
+    <p class="lead reveal">A slow system, a product that needs building end to end, an AI feature that has to actually work — bring it. Worst case, you leave with a clearer picture of the problem.</p>
+    <div class="hero-btns reveal">
+      <a class="btn btn-primary" href="mailto:dhruvgupta1992@gmail.com">dhruvgupta1992@gmail.com</a>
+      <a class="btn btn-ghost" href="https://github.com/devthedeveloper" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-inner">
+    <span>© 2026 Dhruv Gupta</span>
+    <span class="mono">go build && ship</span>
+    <span><a href="mailto:dhruvgupta1992@gmail.com">Email</a> · <a href="https://github.com/devthedeveloper" target="_blank" rel="noopener">GitHub</a></span>
+  </div>
+</footer>
+
+<script>
+// scroll reveal
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 60);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// playground typed output
+(function() {
+  const out = document.getElementById('pgOut');
+  const btn = document.getElementById('runBtn');
+  const lines = [
+    ['backend developer', '12 years, core strength'],
+    ['software engineer', 'end to end, always'],
+    ['full-stack developer', 'when the product needs it'],
+    ['all-rounder', 'AI-leveraged, any stack'],
+    ['problem solver', 'the actual job']
+  ];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let running = false;
+
+  function render(done, partial) {
+    let html = '<span class="dim">$ go run dhruv.go</span><br>';
+    done.forEach(l => {
+      html += '<span class="ok">✓</span> ' + l[0].padEnd(22, ' ') + '<span class="dim">// ' + l[1] + '</span><br>';
+    });
+    if (partial !== undefined) {
+      html += '<span class="ok">✓</span> ' + partial + '<span class="cur"></span>';
+    } else {
+      html += '<br><span class="dim">Program exited — problems: 0 remaining.</span>';
+    }
+    out.innerHTML = html;
+  }
+
+  function run() {
+    if (running) return;
+    running = true;
+    if (reduced) { render(lines); running = false; return; }
+    let li = 0;
+    function typeLine() {
+      if (li >= lines.length) { render(lines); running = false; return; }
+      const word = lines[li][0];
+      let ci = 0;
+      const t = setInterval(() => {
+        ci++;
+        render(lines.slice(0, li), word.slice(0, ci));
+        if (ci >= word.length) {
+          clearInterval(t);
+          li++;
+          setTimeout(typeLine, 140);
+        }
+      }, 26);
+    }
+    out.innerHTML = '<span class="dim">$ go run dhruv.go</span><br><span class="cur"></span>';
+    setTimeout(typeLine, 350);
+  }
+
+  btn.addEventListener('click', run);
+  const heroIo = new IntersectionObserver((es) => {
+    es.forEach(e => { if (e.isIntersecting) { run(); heroIo.disconnect(); } });
+  }, { threshold: 0.3 });
+  heroIo.observe(out);
+})();
+</script>
+</body>
+</html>
