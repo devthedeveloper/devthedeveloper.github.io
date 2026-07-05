@@ -478,7 +478,7 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
 <div class="stats">
   <div class="stats-inner">
     <div class="stat"><span class="stat-val">12</span><span class="stat-key">years of engineering</span></div>
-    <div class="stat"><span class="stat-val">95</span><span class="stat-key">public repositories</span></div>
+    <div class="stat"><span class="stat-val">96</span><span class="stat-key">public repositories</span></div>
     <div class="stat"><span class="stat-val">100+</span><span class="stat-key">projects shipped</span></div>
     <div class="stat"><span class="stat-val">∞</span><span class="stat-key">stacks, AI-leveraged</span></div>
   </div>
@@ -756,11 +756,43 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
   <div class="container">
     <div class="sec-label reveal">// pinned on github</div>
     <h2 class="sec-heading reveal">Fresh off the compiler</h2>
-    <p class="sec-sub reveal">Newest build first, then the six pinned to my profile — four Go (one of them teaches it), two C++. The AI work gets its own section below.</p>
+    <p class="sec-sub reveal">Two fresh builds first, then the six pinned to my profile — four Go (one of them teaches it), two C++. More AI work below.</p>
 
     <div class="featured reveal">
       <div class="featured-body">
-        <span class="featured-flag">Latest · shipped this week</span>
+        <span class="featured-flag">Flagship · new this week</span>
+        <h3>archi</h3>
+        <div class="tagline">an architect that knows your codebase</div>
+        <p>Learns your repo, interviews you about the change with scenario-based questions, then designs it — with Mermaid diagrams grounded in your real modules. Approve the plan and it writes the code. Pluggable LLM backend (Ollama GLM / Claude), zero dependencies.</p>
+        <ul class="featured-feats">
+          <li>Interviews first — the decision-critical questions before designing</li>
+          <li>Approve → it generates real files, with <code>.bak</code> backups &amp; a path guard</li>
+          <li>Mermaid diagrams, HTML export, streaming terminal UI</li>
+        </ul>
+        <a class="repo-link" href="https://github.com/devthedeveloper/archi" target="_blank" rel="noopener">github.com/devthedeveloper/archi ↗</a>
+      </div>
+      <div class="featured-term">
+        <div class="pg-bar">
+          <div class="pg-dots"><span></span><span></span><span></span></div>
+          <span class="pg-file">zsh</span>
+        </div>
+        <div class="term-body"><span class="dim"># learn the repo once</span>
+<span class="gn">$</span> archi init
+<span class="gn">✓</span> Understood → .archi/profile.md
+
+<span class="gn">$</span> archi design <span class="ye">"add webhooks with retries"</span>
+  <span class="cy">1.</span> at-least-once or exactly-once?
+  <span class="dim">↳</span> exactly-once
+  <span class="dim">… design streams, with diagrams …</span>
+  <span class="cy">a</span> approve &amp; build  <span class="cy">m</span> modify  <span class="cy">q</span> ask
+<span class="gn">$</span> a
+<span class="gn">✓</span> Wrote 4 files <span class="dim">· backed up to .bak</span></div>
+      </div>
+    </div>
+
+    <div class="featured reveal">
+      <div class="featured-body">
+        <span class="featured-flag">Go · zero deps</span>
         <h3>llmcat</h3>
         <div class="tagline">cat, but for LLMs</div>
         <p>Packs an entire codebase into one clean, LLM-ready file — annotated file tree plus every source file fenced — so you can hand a whole repo to Claude in a single paste. Pure Go standard library, zero dependencies, one static binary.</p>
