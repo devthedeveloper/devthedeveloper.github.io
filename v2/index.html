@@ -760,15 +760,16 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
 
     <div class="featured reveal">
       <div class="featured-body">
-        <span class="featured-flag">Flagship · new this week</span>
+        <span class="featured-flag">Flagship · v1.8 — my first big AI project in Go</span>
         <h3>archi</h3>
         <div class="tagline">an architect that knows your codebase</div>
-        <p>Learns your repo, interviews you about the change with scenario-based questions, then designs it — with Mermaid diagrams grounded in your real modules. Approve the plan and it writes the code. Pluggable LLM backend (Ollama GLM / Claude), zero dependencies.</p>
+        <p>Learns your repo once, then designs changes with a multi-agent ensemble — explorer plus security, simplicity, and grounding critics — builds them with a parallel swarm, verifies with your own toolchain, and rolls back on demand. Ships three ways: a CLI, an MCP server for Claude Code &amp; Cursor, and a GitHub App that answers <code>/archi</code> comments with designs and draft PRs. Zero dependencies across both modules.</p>
         <ul class="featured-feats">
-          <li>Interviews first — the decision-critical questions before designing</li>
-          <li>Approve → it generates real files, with <code>.bak</code> backups &amp; a path guard</li>
-          <li>Mermaid diagrams, HTML export, streaming terminal UI</li>
+          <li>Design ensemble with a critic panel &amp; revision rounds before you ever see the doc</li>
+          <li>Approve → parallel build swarm, verify-and-repair loop, versioned backups + <code>rollback</code></li>
+          <li>6 MCP tools · <code>/archi design --pr</code> → draft PR · auto-review check runs on every PR</li>
         </ul>
+        <a class="repo-link" href="/archi/">the full story → /archi ↗</a><br>
         <a class="repo-link" href="https://github.com/devthedeveloper/archi" target="_blank" rel="noopener">github.com/devthedeveloper/archi ↗</a>
       </div>
       <div class="featured-term">
@@ -781,12 +782,12 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
 <span class="gn">✓</span> Understood → .archi/profile.md
 
 <span class="gn">$</span> archi design <span class="ye">"add webhooks with retries"</span>
-  <span class="cy">1.</span> at-least-once or exactly-once?
-  <span class="dim">↳</span> exactly-once
-  <span class="dim">… design streams, with diagrams …</span>
-  <span class="cy">a</span> approve &amp; build  <span class="cy">m</span> modify  <span class="cy">q</span> ask
+  <span class="cy">▸</span> Exploring … <span class="gn">✓</span> brief from 12 files
+  <span class="cy">▸</span> Review panel: security · simplicity · grounding
+  <span class="gn">✓</span> panel signed off — <span class="cy">a</span> approve &amp; build
 <span class="gn">$</span> a
-<span class="gn">✓</span> Wrote 4 files <span class="dim">· backed up to .bak</span></div>
+<span class="gn">✓</span> Wrote 4 files <span class="dim">· backed up to .archi/backups/</span>
+<span class="gn">✓</span> go vet &amp;&amp; go test <span class="gn">ok</span></div>
       </div>
     </div>
 
