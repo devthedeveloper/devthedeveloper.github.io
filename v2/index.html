@@ -510,12 +510,11 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
           <span class="tag good" style="margin-left:auto">shipped ✓</span>
         </div>
         <div class="arch-scroll">
-        <svg viewBox="0 0 960 570" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace" role="img" aria-label="System design diagram: clients through API gateway and order service to PostgreSQL with outbox, Kafka event bus, and workers with dead-letter queue">
+        <svg id="archSvg" viewBox="0 0 960 570" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace" role="img" aria-label="System design diagram: clients through API gateway and order service to PostgreSQL with outbox, Kafka event bus, and workers with dead-letter queue">
           <defs>
             <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0,0 L10,5 L0,10 z" fill="#56707E"/>
             </marker>
-            <path id="flowpath" d="M140,152 L735,152 L735,324 L280,324 L280,436" fill="none"/>
           </defs>
 
           <!-- clients -->
@@ -590,27 +589,20 @@ footer { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); 
             <line x1="360" y1="152" x2="416" y2="152" marker-end="url(#arr)"/>
             <line x1="590" y1="134" x2="646" y2="116" marker-end="url(#arr)"/>
             <line x1="590" y1="170" x2="646" y2="192" marker-end="url(#arr)"/>
-            <line x1="735" y1="148" x2="735" y2="296" marker-end="url(#arr)"/>
+            <path d="M672,148 L672,160 L628,160 L628,296" marker-end="url(#arr)"/>
             <line x1="280" y1="348" x2="280" y2="396" marker-end="url(#arr)"/>
             <line x1="500" y1="348" x2="500" y2="396" marker-end="url(#arr)"/>
             <line x1="725" y1="348" x2="725" y2="396" marker-end="url(#arr)"/>
             <line x1="280" y1="472" x2="280" y2="500" marker-end="url(#arr)"/>
           </g>
-          <text x="748" y="230" fill="#7E99A7" font-size="10.5">outbox relay</text>
+          <text x="618" y="234" text-anchor="end" fill="#7E99A7" font-size="10.5">outbox relay</text>
           <text x="290" y="490" fill="#7E99A7" font-size="10.5">poison msgs</text>
 
-          <!-- animated order flowing through -->
-          <g class="flowdots">
-            <circle r="5" fill="#00ADD8">
-              <animateMotion dur="7s" repeatCount="indefinite" rotate="0">
-                <mpath href="#flowpath"/>
-              </animateMotion>
-            </circle>
-            <circle r="5" fill="#00ADD8" opacity="0.6">
-              <animateMotion dur="7s" begin="3.5s" repeatCount="indefinite" rotate="0">
-                <mpath href="#flowpath"/>
-              </animateMotion>
-            </circle>
+          <!-- one order travelling the happy path — positioned by the
+               order-flow script below (SMIL mpath proved flaky across engines) -->
+          <g class="flowdots" id="flowDots" opacity="0">
+            <circle id="flowRing" cx="140" cy="152" r="6" fill="none" stroke="#00ADD8" stroke-width="2" opacity="0"/>
+            <circle id="flowDot" cx="140" cy="152" r="5" fill="#00ADD8"/>
           </g>
         </svg>
         </div>
@@ -975,6 +967,93 @@ const io = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.08 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// order-flow animation — one order travels the happy path, pausing with a
+// pulse at each numbered decision (gateway → outbox commit → payments
+// worker), riding inside the Kafka bus, fading out instead of teleporting.
+// Position is a pure function of elapsed time, driven by rAF, and only runs
+// while the diagram is on screen. Replaces SMIL animateMotion, whose mpath
+// reference resolved unreliably across engines.
+(function () {
+  const svg = document.getElementById('archSvg');
+  const g = document.getElementById('flowDots');
+  if (!svg || !g) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // CSS hides the group
+  const dot = document.getElementById('flowDot');
+  const ring = document.getElementById('flowRing');
+
+  const route = [
+    { x: 140, y: 152 },               // leaves the client
+    { x: 275, y: 152, dwell: 650 },   // ① gateway — idempotency key checked
+    { x: 505, y: 152, dwell: 450 },   //   order service
+    { x: 726, y: 132, dwell: 750 },   // ② postgres — row + outbox, one tx
+    { x: 672, y: 152 },               //   out of the DB…
+    { x: 628, y: 160 },               //   …onto the outbox relay
+    { x: 628, y: 324 },               //   into the bus
+    { x: 280, y: 324, dwell: 400 },   //   rides the bus
+    { x: 280, y: 436, dwell: 900 }    // ③ payments worker — settled
+  ];
+  const SPEED = 0.26;                 // px per ms
+  const FADE = 300, REST = 1100, PULSE = 550;
+
+  const timeline = [];
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1], b = route[i];
+    timeline.push({ move: true, a, b, dur: Math.hypot(b.x - a.x, b.y - a.y) / SPEED });
+    if (b.dwell) timeline.push({ move: false, at: b, dur: b.dwell });
+  }
+  const TRAVEL = timeline.reduce((s, e) => s + e.dur, 0);
+  const CYCLE = TRAVEL + REST;
+
+  let visible = false, start = null, lastPulse = '', ringT0 = 0;
+  new IntersectionObserver(es => es.forEach(e => { visible = e.isIntersecting; }), { threshold: 0.15 }).observe(svg);
+
+  function setPos(x, y) {
+    dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+  }
+  function frame(now) {
+    requestAnimationFrame(frame);
+    if (!visible) { start = null; g.setAttribute('opacity', '0'); return; }
+    if (start === null) { start = now; lastPulse = ''; ringT0 = 0; }
+    const elapsed = now - start;
+    const t = elapsed % CYCLE;
+    const cycle = Math.floor(elapsed / CYCLE);
+
+    // fade in at the start of the run, out at its end, hidden while resting
+    const op = t >= TRAVEL ? 0 : Math.max(0, Math.min(t / FADE, 1, (TRAVEL - t) / FADE));
+    g.setAttribute('opacity', op.toFixed(3));
+
+    // walk the timeline to the current event
+    let rem = t, x = route[0].x, y = route[0].y;
+    for (let i = 0; i < timeline.length && t < TRAVEL; i++) {
+      const e = timeline[i];
+      if (rem > e.dur) { rem -= e.dur; continue; }
+      if (e.move) {
+        const k = rem / e.dur;
+        x = e.a.x + (e.b.x - e.a.x) * k;
+        y = e.a.y + (e.b.y - e.a.y) * k;
+      } else {
+        x = e.at.x; y = e.at.y;
+        const key = cycle + ':' + i;
+        if (lastPulse !== key) { // arriving at a decision: pulse once
+          lastPulse = key; ringT0 = now;
+          ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+        }
+      }
+      break;
+    }
+    setPos(x, y);
+
+    const rt = ringT0 ? (now - ringT0) / PULSE : 2;
+    if (rt <= 1) {
+      ring.setAttribute('r', (6 + 14 * rt).toFixed(2));
+      ring.setAttribute('opacity', (0.7 * (1 - rt)).toFixed(3));
+    } else {
+      ring.setAttribute('opacity', '0');
+    }
+  }
+  requestAnimationFrame(frame);
+})();
 
 // playground typed output
 (function() {
