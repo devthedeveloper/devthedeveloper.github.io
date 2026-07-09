@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Beginner-friendly handwritten-style study notes with hand-drawn diagrams for Chapter 1 of An Illustrated Guide to AI Agents, plus an interview cheat-sheet.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="AI Agents - Chapter 1 Handwritten Notes">
+<meta property="og:description" content="Simple illustrated study notes on AI agents, with an interview cheat-sheet.">
+<style>*{margin:0;padding:0}html{-webkit-text-size-adjust:100%}</style>
+<title>AI Agents · Ch.1 Handwritten Notes</title>
+</head>
+<body>
+<style>
+  :root{
+    --paper:#f7f6f0;
+    --paper-2:#fdfdf9;
+    --rule:#cddcea;
+    --margin:#e6a6a2;
+    --ink:#233252;         /* ballpoint blue-black */
+    --ink-soft:#3c4a66;
+    --pencil:#6c7079;
+    --red:#c75450;         /* pen red */
+    --hl-yellow:#fbe488;
+    --hl-mint:#b9e7c9;
+    --hl-blue:#bcdcf3;
+    --sticky:#fff3b0;
+    --sticky-2:#c8ecd4;
+    --tape:rgba(200,190,150,.45);
+    --shadow:rgba(40,45,60,.18);
+    --box:#fffef9;
+    --hand:"Segoe Print","Bradley Hand","Chalkboard SE","Comic Sans MS","Comic Sans",cursive;
+    --mono:"Courier New",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#213029;      /* chalkboard green */
+      --paper-2:#25352d;
+      --rule:#33463c;
+      --margin:#7d5b57;
+      --ink:#f1ede1;        /* chalk white */
+      --ink-soft:#d7d3c6;
+      --pencil:#a6b0a4;
+      --red:#f0a49c;
+      --hl-yellow:#6a6330;
+      --hl-mint:#3a5c46;
+      --hl-blue:#2f4f63;
+      --sticky:#4a4526;
+      --sticky-2:#33513f;
+      --tape:rgba(190,180,140,.28);
+      --shadow:rgba(0,0,0,.4);
+      --box:#28382f;
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#f7f6f0;--paper-2:#fdfdf9;--rule:#cddcea;--margin:#e6a6a2;--ink:#233252;--ink-soft:#3c4a66;
+    --pencil:#6c7079;--red:#c75450;--hl-yellow:#fbe488;--hl-mint:#b9e7c9;--hl-blue:#bcdcf3;--sticky:#fff3b0;
+    --sticky-2:#c8ecd4;--tape:rgba(200,190,150,.45);--shadow:rgba(40,45,60,.18);--box:#fffef9;
+  }
+  :root[data-theme="dark"]{
+    --paper:#213029;--paper-2:#25352d;--rule:#33463c;--margin:#7d5b57;--ink:#f1ede1;--ink-soft:#d7d3c6;
+    --pencil:#a6b0a4;--red:#f0a49c;--hl-yellow:#6a6330;--hl-mint:#3a5c46;--hl-blue:#2f4f63;--sticky:#4a4526;
+    --sticky-2:#33513f;--tape:rgba(190,180,140,.28);--shadow:rgba(0,0,0,.4);--box:#28382f;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0}
+  .page-bg{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--hand);
+    line-height:1.7;
+    min-height:100vh;
+    padding:clamp(14px,4vw,48px) clamp(10px,3vw,32px) 80px;
+  }
+  .sheet{
+    max-width:920px;margin:0 auto;
+    background:
+      repeating-linear-gradient(var(--paper-2) 0 37px, var(--rule) 37px 38px);
+    background-attachment:local;
+    border-radius:6px;
+    box-shadow:0 8px 30px var(--shadow), 0 1px 0 rgba(255,255,255,.2) inset;
+    position:relative;
+    padding:clamp(26px,5vw,60px) clamp(20px,5vw,58px) 70px;
+    overflow:hidden;
+  }
+  .sheet::before{ /* red margin line */
+    content:"";position:absolute;top:0;bottom:0;left:clamp(34px,7vw,62px);
+    width:2px;background:var(--margin);opacity:.7;
+  }
+  @media (max-width:560px){ .sheet::before{display:none} }
+
+  h1,h2,h3{font-family:var(--hand);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+  p{margin:.5em 0}
+
+  .head{position:relative;margin-bottom:14px}
+  .head h1{font-size:clamp(30px,7vw,52px);letter-spacing:.5px;color:var(--ink)}
+  .head .ch{color:var(--red);display:block;font-size:clamp(15px,3.5vw,20px);letter-spacing:2px;text-transform:uppercase}
+  .credit{color:var(--pencil);font-size:15px;margin-top:2px}
+  .credit em{color:var(--ink-soft);font-style:normal;border-bottom:2px dotted var(--pencil)}
+
+  /* big idea banner */
+  .bigidea{
+    margin:22px 0 30px;padding:16px 20px;
+    background:var(--box);
+    border:2.5px solid var(--ink);
+    border-radius:16px 9px 20px 8px / 9px 18px 10px 20px;
+    box-shadow:3px 4px 0 var(--shadow);
+    font-size:clamp(17px,3.6vw,21px);
+  }
+  .bigidea b{color:var(--red)}
+
+  section{margin:38px 0}
+  .sec-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:38px;height:38px;margin-right:10px;flex:none;
+    border:2.5px solid var(--red);color:var(--red);
+    border-radius:50% 48% 52% 50% / 50% 52% 48% 50%;
+    font-size:20px;transform:rotate(-4deg);
+  }
+  h2.sec{display:flex;align-items:center;font-size:clamp(23px,5vw,33px);color:var(--ink);gap:2px;margin-bottom:6px}
+  h3.sub{font-size:clamp(18px,4vw,23px);color:var(--ink-soft);margin:22px 0 4px;display:flex;align-items:center;gap:8px}
+  h3.sub::before{content:"▸";color:var(--red);font-size:.9em}
+
+  .lead{font-size:clamp(16px,3.4vw,18px)}
+  ul.notes{list-style:none;padding-left:6px;margin:8px 0}
+  ul.notes li{position:relative;padding-left:26px;margin:7px 0;font-size:clamp(15.5px,3.3vw,17.5px)}
+  ul.notes li::before{content:"→";position:absolute;left:0;color:var(--red);font-weight:700}
+
+  mark{background:transparent;color:inherit;
+    background-image:linear-gradient(transparent 52%, var(--hl-yellow) 52%, var(--hl-yellow) 92%, transparent 92%);
+    padding:0 2px;}
+  mark.mint{background-image:linear-gradient(transparent 52%, var(--hl-mint) 52%, var(--hl-mint) 92%, transparent 92%)}
+  mark.blue{background-image:linear-gradient(transparent 52%, var(--hl-blue) 52%, var(--hl-blue) 92%, transparent 92%)}
+  .red{color:var(--red)}
+  b,strong{color:var(--ink)}
+
+  /* definition / remember box */
+  .def{
+    background:var(--box);border:2.5px dashed var(--ink-soft);
+    border-radius:12px 18px 10px 16px / 16px 10px 18px 12px;
+    padding:14px 18px;margin:16px 0;box-shadow:2px 3px 0 var(--shadow);
+  }
+  .def .tag{display:inline-block;transform:rotate(-2deg);background:var(--red);color:var(--paper-2);
+    padding:1px 12px;border-radius:20px;font-size:14px;letter-spacing:1px;margin-bottom:6px}
+
+  /* sticky note */
+  .sticky{
+    position:relative;background:var(--sticky);color:var(--ink);
+    padding:16px 18px 18px;margin:20px 0;
+    box-shadow:3px 5px 12px var(--shadow);
+    transform:rotate(-1.4deg);
+    font-size:16px;
+  }
+  .sticky.g{background:var(--sticky-2);transform:rotate(1.2deg)}
+  .sticky::before{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-3deg);
+    width:96px;height:22px;background:var(--tape);border-radius:2px}
+  .sticky .t{display:block;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:3px}
+  .sticky.g .t{color:var(--ink-soft)}
+
+  /* analogy chip */
+  .analogy{display:flex;gap:12px;align-items:flex-start;background:var(--box);
+    border-left:5px solid var(--hl-yellow);border-radius:6px;padding:11px 15px;margin:14px 0;font-size:16px;
+    box-shadow:1px 2px 6px var(--shadow)}
+  .analogy .em{font-size:26px;line-height:1;flex:none}
+
+  /* trainer tip */
+  .tip{display:flex;gap:11px;align-items:flex-start;border:2px solid var(--hl-blue);
+    background:color-mix(in srgb,var(--hl-blue) 22%, var(--box));
+    border-radius:10px 14px 9px 13px;padding:11px 15px;margin:14px 0;font-size:15.5px}
+  .tip .em{font-size:22px;flex:none}
+  .tip b{color:var(--red)}
+
+  /* figure box */
+  figure.fig{margin:22px 0;background:var(--box);border:2.5px solid var(--ink);
+    border-radius:14px 10px 16px 9px / 9px 16px 10px 14px;
+    box-shadow:3px 5px 0 var(--shadow);padding:16px 14px 6px;overflow:hidden}
+  figure.fig svg{display:block;width:100%;height:auto}
+  figcaption{font-family:var(--hand);color:var(--pencil);font-size:14px;text-align:center;padding:6px 8px 4px}
+  figcaption b{color:var(--red)}
+
+  code,.mono{font-family:var(--mono);font-size:.92em;background:color-mix(in srgb,var(--ink) 10%, var(--box));
+    padding:1px 6px;border-radius:5px;color:var(--ink)}
+
+  /* q&a cheat sheet */
+  .qa{border:2.5px solid var(--ink);border-radius:14px 10px 14px 10px;background:var(--box);
+    padding:6px 18px;margin:16px 0;box-shadow:3px 5px 0 var(--shadow)}
+  .qa details{border-bottom:1.5px dashed var(--rule);padding:10px 0}
+  .qa details:last-child{border-bottom:none}
+  .qa summary{cursor:pointer;font-size:17px;color:var(--ink);list-style:none;display:flex;gap:10px;align-items:flex-start}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary .q{color:var(--red);font-weight:700;flex:none}
+  .qa summary::after{content:"+";margin-left:auto;color:var(--red);font-size:22px;line-height:1}
+  .qa details[open] summary::after{content:"–"}
+  .qa .ans{padding:8px 4px 2px 28px;font-size:16px;color:var(--ink-soft)}
+
+  .divider{display:flex;align-items:center;gap:12px;color:var(--pencil);margin:34px 0;font-size:15px}
+  .divider::before,.divider::after{content:"";height:2px;flex:1;background:var(--rule)}
+
+  a.src{color:var(--ink-soft)}
+  .footnote{color:var(--pencil);font-size:13.5px;margin-top:8px}
+
+  svg text{font-family:var(--hand)}
+  @media (prefers-reduced-motion:no-preference){
+    .qa details[open] .ans{animation:fade .3s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+  }
+</style>
+
+<!-- hidden defs: hand-drawn wobble filter reused by all diagrams -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="sketch"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter>
+    <filter id="sketch2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="12" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+  </defs>
+</svg>
+
+<div class="page-bg">
+<div class="sheet">
+
+  <header class="head">
+    <span class="ch">Chapter 1 · Introduction</span>
+    <h1>AI Agents — my notes 🤖</h1>
+    <p class="credit">From <em>An Illustrated Guide to AI Agents</em> — Jay Alammar &amp; Maarten Grootendorst (O'Reilly, Early Release)</p>
+  </header>
+
+  <div class="bigidea">
+    <b>The one-line version:</b> An <b>AI Agent</b> is an LLM (the "brain") that has been given
+    <mark>eyes, hands, and a memory</mark> so it can <mark class="mint">think, decide, and actually
+    <em>do things</em></mark> in the world — not just chat.
+  </div>
+
+  <div class="sticky">
+    <span class="t">Read me first</span>
+    You don't need a tech background for this. Everything below is an everyday analogy first,
+    the "proper" word second. If you only remember one picture, remember the
+    <b>brain + eyes + hands + notebook</b> one. That's an agent.
+  </div>
+
+
+  <!-- 1 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">1</span> Why is everyone suddenly talking about this?</h2>
+    <ul class="notes">
+      <li><b>2022 — ChatGPT arrives.</b> It could <em>talk</em>. Huge deal, but it only produced <b>text</b>.</li>
+      <li><b>2024 — AI Agents arrive.</b> The big leap: they can <mark>act with autonomy, chase a goal,
+        and interact with the world</mark> — write whole codebases, remember long conversations, reason step by step.</li>
+      <li>The key new ingredient is <span class="red"><b>agency</b></span> — the AI decides
+        <b>what</b> to do, <b>when</b>, and <b>how</b>, instead of being spoon-fed every step.</li>
+      <li>They're already showing up in <b>coding, finance, healthcare, marketing &amp; research</b>.</li>
+    </ul>
+    <div class="analogy">
+      <span class="em">🧑‍💼</span>
+      <div><b>Analogy:</b> A plain LLM is like a brilliant person locked in an empty room who can only
+      <em>talk</em>. An agent is that same person given a phone, a computer, and a to-do list — now they can
+      actually <em>get things done</em>.</div>
+    </div>
+  </section>
+
+
+  <!-- 2 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">2</span> So… what <em>is</em> an AI Agent?</h2>
+    <p class="lead">The book starts from a classic 60-year-old definition of <em>any</em> agent (from the famous AI textbook by Russell &amp; Norvig):</p>
+
+    <div class="def">
+      <span class="tag">DEFINITION</span>
+      <p style="margin:0;font-size:18px">"An agent is anything that can <mark>perceive its environment through
+      <b>sensors</b></mark> and <mark class="mint">act on it through <b>actuators</b></mark>."</p>
+    </div>
+
+    <p>Break that into <b>four simple parts</b> — this is the skeleton of the whole book:</p>
+    <ul class="notes">
+      <li><b>Environment</b> = the world the agent lives in &amp; works on <span class="red">(incl. you, the user!)</span></li>
+      <li><b>Sensors</b> = how it <em>observes</em> the world <span class="red">(its eyes &amp; ears)</span></li>
+      <li><b>Actuators</b> = how it <em>acts</em> on the world <span class="red">(its hands = tools)</span></li>
+      <li><b>Effector</b> = the <em>"brain"</em> that decides: observation → action</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 300" role="img" aria-label="The agent loop: environment sensed by sensors, processed by the brain, acted on by actuators, back to the environment">
+        <g filter="url(#sketch)" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round">
+          <!-- environment big frame -->
+          <rect x="14" y="16" width="612" height="268" rx="20"/>
+          <!-- agent box -->
+          <rect x="238" y="96" width="164" height="108" rx="16" stroke="var(--red)"/>
+          <!-- sensors + actuators boxes -->
+          <rect x="60" y="120" width="120" height="60" rx="12"/>
+          <rect x="460" y="120" width="120" height="60" rx="12"/>
+          <!-- arrows -->
+          <path d="M182 150 L236 150" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M404 150 L458 150" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M520 118 C540 60 120 52 120 118" marker-end="url(#arrow)" stroke="var(--pencil)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="120" y="112" font-size="15" fill="var(--pencil)">👀 SENSORS</text>
+          <text x="120" y="156" font-size="14">observe</text>
+          <text x="520" y="112" font-size="15" fill="var(--pencil)">✋ ACTUATORS</text>
+          <text x="520" y="156" font-size="14">act / tools</text>
+          <text x="320" y="140" font-size="17" fill="var(--red)">EFFECTOR</text>
+          <text x="320" y="166" font-size="15">the "brain" 🧠</text>
+          <text x="320" y="186" font-size="12" fill="var(--pencil)">decides what to do</text>
+          <text x="320" y="42" font-size="15" fill="var(--pencil)">ENVIRONMENT (the world + the user)</text>
+          <text x="320" y="270" font-size="13" fill="var(--pencil)">…and the loop repeats →</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 1.</b> The agent loop — sense → think → act → repeat.</figcaption>
+    </figure>
+
+    <h3 class="sub">Now map it to a real AI agent</h3>
+    <p>Those textbook words become very concrete once you plug in an LLM:</p>
+    <ul class="notes">
+      <li><b>Effector / brain</b> → a <mark>"reasoning" LLM</mark> (a model that can think in steps)</li>
+      <li><b>Actuators / hands</b> → the LLM's <mark class="mint">tools</mark> (search, calculator, code, APIs…)</li>
+      <li><b>Sensors / eyes</b> → the LLM reading <mark class="blue">images or sound</mark>, not just text</li>
+      <li><b>Environment</b> → the digital world <b>+ you</b>. No user prompt = the agent just sits there.</li>
+    </ul>
+    <div class="tip">
+      <span class="em">🎙️</span>
+      <div><b>Trainer tip:</b> In a room, draw the little robot: <b>brain</b> in the head, <b>eyes</b>,
+      <b>hands</b>, and a <b>notebook</b> in its pocket. Every concept in this chapter clips onto one of
+      those four body parts. People remember bodies, not bullet points.</div>
+    </div>
+  </section>
+
+
+  <!-- 3 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">3</span> The brain, part 1: the LLM <span style="font-size:.6em;color:var(--pencil)">(Ch 2)</span></h2>
+    <p>Strip away everything fancy and an <b>LLM (Large Language Model)</b> does exactly one thing:</p>
+    <div class="def">
+      <span class="tag">CORE IDEA</span>
+      <p style="margin:0;font-size:18px">It <mark>predicts the next word</mark> (well, the next <em>token</em>) based on the text so far. That's it.</p>
+    </div>
+    <ul class="notes">
+      <li><b>Tokens</b> = little chunks of words. Splitting into chunks lets the model handle words it's never seen.</li>
+      <li>It guesses the next token, <b>adds it to the text, then guesses again</b>… over and over.</li>
+      <li>That repeat-loop has a name: <span class="red"><b>autoregression</b></span>. It's how one guess becomes a full paragraph.</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="LLM predicting the next token, then feeding it back to predict again">
+        <g filter="url(#sketch2)" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round">
+          <rect x="24" y="70" width="250" height="56" rx="12"/>
+          <rect x="330" y="60" width="120" height="76" rx="14" stroke="var(--red)"/>
+          <rect x="500" y="70" width="118" height="56" rx="12"/>
+          <path d="M276 98 L328 98" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M452 98 L498 98" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M558 128 C560 190 150 190 148 128" marker-end="url(#arrow)" stroke="var(--pencil)" stroke-dasharray="5 6"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="149" y="94" font-size="15">"The cat sat on the</text>
+          <text x="149" y="116" font-size="15">___ "</text>
+          <text x="390" y="94" font-size="16" fill="var(--red)">LLM</text>
+          <text x="390" y="116" font-size="12" fill="var(--pencil)">predicts</text>
+          <text x="559" y="102" font-size="16">"mat"</text>
+          <text x="353" y="182" font-size="13" fill="var(--pencil)">feed the new word back in &amp; repeat (autoregression)</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 2.</b> Predict → append → predict again. Fancy autocomplete, basically.</figcaption>
+    </figure>
+
+    <div class="analogy">
+      <span class="em">📱</span>
+      <div><b>Analogy:</b> It's your phone's <em>autocomplete</em> — but trained on a huge chunk of the
+      internet, so its "next word" guesses are shockingly good.</div>
+    </div>
+  </section>
+
+
+  <!-- 4 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">4</span> The brain, part 2: <em>Reasoning</em> LLMs <span style="font-size:.6em;color:var(--pencil)">(Ch 3)</span></h2>
+    <ul class="notes">
+      <li>For years we made models better by making them <b>bigger</b> — more data, more compute.
+        This is <b>train-time scaling</b>.</li>
+      <li>But bigger got <mark>hugely expensive for smaller and smaller gains</mark> — a ceiling.</li>
+      <li>New trick, copied from humans: make the model <span class="red"><b>"think out loud"</b></span> before answering.</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 200" role="img" aria-label="A reasoning LLM writes hidden thoughts first, then gives a summary answer">
+        <g filter="url(#sketch)" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round">
+          <rect x="20" y="78" width="120" height="48" rx="12"/>
+          <rect x="215" y="34" width="210" height="130" rx="16" stroke="var(--red)" stroke-dasharray="7 6"/>
+          <rect x="500" y="78" width="118" height="48" rx="12"/>
+          <path d="M142 102 L213 102" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M427 102 L498 102" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="80" y="107" font-size="15">question</text>
+          <text x="320" y="30" font-size="13" fill="var(--red)">💭 hidden "thoughts"</text>
+          <text x="320" y="64" font-size="13" fill="var(--pencil)">step 1 → step 2 →</text>
+          <text x="320" y="86" font-size="13" fill="var(--pencil)">step 3 → check…</text>
+          <text x="320" y="140" font-size="12" fill="var(--pencil)">(you usually don't see these)</text>
+          <text x="559" y="107" font-size="15">answer</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 3.</b> Think first (privately), then hand you a tidy answer.</figcaption>
+    </figure>
+
+    <ul class="notes">
+      <li>The model spends extra effort writing out its steps first → <mark class="mint">much better at
+        hard, multi-step problems</mark>. The steps are usually hidden; you just get the summary.</li>
+      <li>This is what lets agents <b>plan, pick tools, and fix their own mistakes</b> — so reasoning LLMs
+        are the star of the book.</li>
+      <li>Trade-off: reasoning is <b>slower &amp; pricier</b>. For quick, cheap answers, a normal LLM is fine.</li>
+    </ul>
+    <div class="analogy">
+      <span class="em">✍️</span>
+      <div><b>Analogy:</b> A maths student who <em>shows their working</em> gets the hard questions right far
+      more often than one who blurts the first number that comes to mind.</div>
+    </div>
+    <div class="sticky g">
+      <span class="t">Chapters 2 + 3 = "the brain"</span>
+      Ch 2 is the plain LLM. Ch 3 is the reasoning LLM. Together they're the <b>brain</b> of every agent.
+      Everything after this is about giving that brain a <b>body</b>.
+    </div>
+  </section>
+
+
+  <!-- 5 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">5</span> Giving the brain a body: <em>augmenting</em> the LLM <span style="font-size:.6em;color:var(--pencil)">(Ch 4–6)</span></h2>
+    <p class="lead">A brilliant brain alone can't remember you, can't press buttons, and can't make a plan.
+    We bolt on <b>three add-ons</b> to fix that. 👇</p>
+
+    <h3 class="sub">Memory <span style="font-size:.7em;color:var(--pencil)">(Ch 4)</span></h3>
+    <ul class="notes">
+      <li>An LLM by itself is <span class="red"><b>stateless</b></span> — it forgets everything the second it
+        replies. Great for one question, useless for a real conversation.</li>
+      <li>Simple fix: <mark>paste the earlier conversation back into the next prompt</mark> so it "remembers."</li>
+      <li>Real memory is richer — <b>short-term</b> vs <b>long-term</b>, just like ours.</li>
+      <li>But too much info = <b>information overload</b> → worse decisions. Choosing <em>what</em> to keep in
+        front of the model is called <mark class="mint">context engineering</mark>.</li>
+    </ul>
+    <div class="analogy">
+      <span class="em">🐠</span>
+      <div><b>Analogy:</b> Without memory the model is a <em>goldfish</em> — new question, blank slate.
+      Memory is the <em>notebook</em> it carries so it can pick up where you left off.</div>
+    </div>
+
+    <h3 class="sub">Tools <span style="font-size:.7em;color:var(--pencil)">(Ch 5)</span></h3>
+    <ul class="notes">
+      <li>Tools let the LLM <mark>reach out and <em>do</em> things</mark>: search the web, run code,
+        use a calculator, hit an API.</li>
+      <li><span class="red">Catch:</span> the LLM can't press the button itself. It's text-in / text-out — all
+        it can do is <b>write down the <em>intent</em></b>.</li>
+      <li>Example: ask <code>"What is 2.3 × 8.1?"</code> and it outputs the text <code>multiply(2.3, 8.1)</code>.
+        <b>Our code</b> sees that, actually runs it, and feeds the answer back.</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="LLM outputs an intent to use a tool, external code runs it and returns the result">
+        <g filter="url(#sketch2)" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round">
+          <rect x="16" y="66" width="150" height="58" rx="12" stroke="var(--red)"/>
+          <rect x="238" y="66" width="164" height="58" rx="12"/>
+          <rect x="474" y="66" width="150" height="58" rx="12"/>
+          <path d="M168 95 L236 95" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M404 95 L472 95" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="91" y="88" font-size="15" fill="var(--red)">LLM</text>
+          <text x="91" y="110" font-size="12" fill="var(--pencil)">"I intend to…"</text>
+          <text x="320" y="90" font-size="13" font-family="var(--mono)">multiply(2.3,8.1)</text>
+          <text x="320" y="110" font-size="11" fill="var(--pencil)">← just text!</text>
+          <text x="549" y="86" font-size="13">our code runs it</text>
+          <text x="549" y="108" font-size="14" fill="var(--red)">= 18.63 ✓</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 4.</b> The LLM <em>asks</em> for a tool; the surrounding software actually uses it.
+      <span style="color:var(--ink-soft)">(A standard called <b>MCP</b> keeps this tidy across models.)</span></figcaption>
+    </figure>
+
+    <h3 class="sub">Planning &amp; reflection <span style="font-size:.7em;color:var(--pencil)">(Ch 6)</span></h3>
+    <ul class="notes">
+      <li><b>Planning</b> = break a big task into small do-able steps (<b>task decomposition</b>) and do them one at a time.</li>
+      <li><b>Reflection</b> = after each step, look back: <mark>did that work? what next? should I change the plan?</mark></li>
+      <li>Together they form a <span class="red"><b>loop</b></span>: plan → act → reflect → adjust → repeat. This is
+        what makes agents feel human — they catch and fix their own mistakes.</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 520 250" role="img" aria-label="The plan, act, reflect loop repeating">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="190" y="20" width="140" height="52" rx="13" stroke="var(--red)"/>
+          <rect x="356" y="150" width="150" height="52" rx="13" stroke="var(--ink)"/>
+          <rect x="18" y="150" width="150" height="52" rx="13" stroke="var(--ink)"/>
+          <path d="M330 60 C430 78 452 118 440 148" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M356 182 C260 210 180 210 168 184" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M78 148 C60 110 100 74 188 58" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="260" y="52" font-size="17" fill="var(--red)">📋 PLAN</text>
+          <text x="431" y="182" font-size="16">✋ ACT</text>
+          <text x="93" y="182" font-size="16">🤔 REFLECT</text>
+          <text x="260" y="130" font-size="13" fill="var(--pencil)">…then loop again</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 5.</b> The engine of an agent: plan, act, reflect — on repeat.</figcaption>
+    </figure>
+
+    <div class="def">
+      <span class="tag">PUT IT TOGETHER</span>
+      <p style="margin:0;font-size:18px">Reasoning LLM <b>+ memory + tools + planning/reflection</b> =
+      <mark>an AI Agent</mark>. Anthropic calls the tool-and-memory version the
+      <b>"Augmented LLM."</b></p>
+    </div>
+  </section>
+
+
+  <!-- 6 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">6</span> Setting it loose: the agentic system <span style="font-size:.6em;color:var(--pencil)">(Ch 7)</span></h2>
+
+    <h3 class="sub">Autonomy is a dial, not a switch</h3>
+    <ul class="notes">
+      <li>Agents can have <b>a little</b> freedom or <b>a lot</b>. It's a <mark>spectrum</mark>.</li>
+      <li>Full autonomy is powerful but risky, so we add <span class="red"><b>guardrails</b></span> to stop
+        destructive actions.</li>
+      <li>The book's take: if it shows <b>goal-directed behaviour and makes decisions</b>, it counts as an
+        agent — even a partly-supervised one.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 128" role="img" aria-label="Autonomy spectrum from guardrails and human oversight to full freedom">
+        <g filter="url(#sketch2)" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round">
+          <path d="M40 70 L600 70" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <circle cx="120" cy="70" r="9" fill="var(--hl-mint)" stroke="var(--ink)"/>
+          <circle cx="360" cy="70" r="9" fill="var(--hl-yellow)" stroke="var(--ink)"/>
+          <circle cx="540" cy="70" r="9" fill="var(--red)" stroke="var(--ink)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="120" y="46" font-size="13">tight guardrails</text>
+          <text x="120" y="100" font-size="12" fill="var(--pencil)">human checks each step</text>
+          <text x="360" y="46" font-size="13">picks its own tools</text>
+          <text x="360" y="100" font-size="12" fill="var(--pencil)">some freedom</text>
+          <text x="540" y="46" font-size="13" fill="var(--red)">full autonomy</text>
+          <text x="540" y="100" font-size="12" fill="var(--pencil)">no hand-holding</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 6.</b> More freedom = more power <em>and</em> more risk. Choose the dial to fit the job.</figcaption>
+    </figure>
+
+    <h3 class="sub">Where agents genuinely shine</h3>
+    <ul class="notes">
+      <li><b>Coding</b> 💻 — the #1 use today. Clear goal, some freedom in how. Writes, runs &amp; tests code.</li>
+      <li><b>Deep research</b> 🔬 — give a topic, it hunts sources (ArXiv, PubMed, Scholar) on its own.</li>
+      <li><b>Automation</b> ⚙️ — tidying &amp; standardising messy data across systems (e.g. hospital records).</li>
+    </ul>
+    <div class="sticky">
+      <span class="t">The sweet spot</span>
+      Agents are best when <b>the goal is clear but the path isn't</b> — open-ended problems where you can't
+      script every step in advance.
+    </div>
+
+    <h3 class="sub">Using them responsibly ⚠️</h3>
+    <ul class="notes">
+      <li><b>Human in the loop</b> — a person checks important decisions before they go through.</li>
+      <li><b>Guardrails</b> — don't build a fully-autonomous agent when a limited one is safer &amp; just as good.</li>
+      <li><b>Misinformation / hallucination</b> — agents are still LLMs; they can be <mark>confidently wrong</mark>.
+        Add checks where correctness is critical.</li>
+    </ul>
+    <div class="tip">
+      <span class="em">🎙️</span>
+      <div><b>Trainer tip — the killer line:</b> "You'd happily let an agent draft your code. You would
+      <b>not</b> let it diagnose a patient with no human checking." <em>It's all about context.</em>
+      This one sentence usually lands the whole ethics point.</div>
+    </div>
+
+    <h3 class="sub">Evaluating agents is hard</h3>
+    <ul class="notes">
+      <li>Judging a chatbot = judge the <b>text</b>. Judging an agent = judge <b>a whole sequence of actions</b>.</li>
+      <li>You measure <b>the outcome</b> (did the task get done?) <em>and</em> <b>the process</b>
+        (efficiently? safely? did it follow the rules?).</li>
+      <li>So evaluating an agent means evaluating <mark class="mint">an entire system</mark>, not just a model.</li>
+    </ul>
+  </section>
+
+
+  <!-- 7 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">7</span> Special kinds of agents <span style="font-size:.6em;color:var(--pencil)">(Ch 8–13)</span></h2>
+    <p class="lead">Part 2 of the book takes the basic agent and specialises it four ways:</p>
+    <ul class="notes">
+      <li><b>Multi-agent teams</b> 👥 <span class="red">(Ch 8)</span> — several agents, each a specialist,
+        often led by a <b>supervisor agent</b> (the "manager", running the smartest model) that splits up
+        and hands out the work.</li>
+      <li><b>Multi-modal agents</b> 🖼️🔊 <span class="red">(Ch 9–10)</span> — can <em>see</em> images and
+        <em>hear/speak</em>, not just read text. Needed for things like judging a website's design or talking hands-free.</li>
+      <li><b>Coding agents</b> 💻 <span class="red">(Ch 11–12)</span> — can actually run programs, read a
+        codebase, write functions, fix bugs and test — an autonomous (or assistant) developer.</li>
+      <li><b>Tiny agents</b> 🐜 <span class="red">(Ch 13)</span> — smaller, cheaper, faster. Agents burn tokens
+        unpredictably, so making them efficient (smaller models, cheaper inference) matters a lot.</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 560 210" role="img" aria-label="A supervisor agent delegating to three worker agents">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="205" y="16" width="150" height="52" rx="14" stroke="var(--red)"/>
+          <rect x="40" y="140" width="130" height="52" rx="13" stroke="var(--ink)"/>
+          <rect x="215" y="140" width="130" height="52" rx="13" stroke="var(--ink)"/>
+          <rect x="390" y="140" width="130" height="52" rx="13" stroke="var(--ink)"/>
+          <path d="M250 68 L120 138" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M280 68 L280 138" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M312 68 L442 138" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="280" y="40" font-size="15" fill="var(--red)">🧑‍✈️ SUPERVISOR</text>
+          <text x="280" y="58" font-size="11" fill="var(--pencil)">plans &amp; delegates</text>
+          <text x="105" y="171" font-size="14">researcher</text>
+          <text x="280" y="171" font-size="14">writer</text>
+          <text x="455" y="171" font-size="14">coder</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 7.</b> A multi-agent team — like a manager handing tasks to specialists.</figcaption>
+    </figure>
+  </section>
+
+
+  <div class="divider">✦ the whole chapter on one line ✦</div>
+
+  <div class="bigidea" style="border-style:solid">
+    <b>Recap:</b> Start with an LLM that predicts words → make it <b>reason</b> (think out loud) →
+    give it <b>memory + tools + planning</b> → let it act with some <b>autonomy</b> (plus guardrails) →
+    that's an <b>agent</b>. Then specialise it into <b>teams, multi-modal, coding &amp; tiny</b> agents.
+  </div>
+
+
+  <!-- 8 interview cheat sheet -->
+  <section>
+    <h2 class="sec"><span class="sec-num">★</span> Interview cheat-sheet 🎤</h2>
+    <p class="lead">Likely questions + short, confident answers you can say out loud. Tap to reveal.</p>
+
+    <div class="qa">
+      <details open>
+        <summary><span class="q">Q.</span> In one sentence — what's an AI agent?</summary>
+        <div class="ans">An AI system that uses an LLM as its "brain," plus <b>memory, tools and planning</b>, to
+          <b>decide and take actions</b> toward a goal — not just generate text.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> How is an agent different from ChatGPT?</summary>
+        <div class="ans">ChatGPT <em>talks</em>; an agent <em>acts</em>. The agent adds autonomy — it chooses what to do,
+          when and how, and can use tools and remember context to actually get a task done.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What are the core parts?</summary>
+        <div class="ans">Four: <b>Environment</b> (the world + user), <b>Sensors</b> (how it observes),
+          <b>Actuators</b> (tools it acts with), and the <b>Effector/brain</b> (the reasoning LLM that decides).
+          Or plainly: <b>brain, eyes, hands, memory</b>.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> Why do agents need "reasoning" LLMs?</summary>
+        <div class="ans">Because planning, choosing tools and fixing mistakes are multi-step problems. A model that
+          "thinks out loud" first solves those far better — like showing your working in maths.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> If an LLM can't press buttons, how does it use tools?</summary>
+        <div class="ans">It only outputs <em>text describing the intent</em> (e.g. <code>multiply(2.3, 8.1)</code>).
+          Surrounding software reads that, runs the real tool, and feeds the result back.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What are the main risks / how do we stay safe?</summary>
+        <div class="ans">They can act in the real world and can be confidently wrong (hallucinate). Safeguards:
+          <b>keep a human in the loop</b>, add <b>guardrails</b>, and <b>verify outputs</b> where correctness
+          is critical. Autonomy should match the stakes.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> Where are agents actually useful?</summary>
+        <div class="ans">Best when the <b>goal is clear but the path isn't</b>: coding assistants, deep research,
+          and automating messy, multi-step data work.</div>
+      </details>
+    </div>
+
+    <div class="sticky g" style="margin-top:24px">
+      <span class="t">Your 4 memory anchors</span>
+      <b>1.</b> Agent = LLM + eyes + hands + memory &nbsp; <b>2.</b> LLM = fancy autocomplete &nbsp;
+      <b>3.</b> Reasoning = show your working &nbsp; <b>4.</b> Autonomy = a dial with guardrails.
+      Walk in with those four and you can explain this whole chapter to anyone. Good luck! 🍀
+    </div>
+    <p class="footnote">Notes based on <em>An Illustrated Guide to AI Agents</em>, Ch. 1 (Early Release) —
+      Grootendorst &amp; Alammar, O'Reilly. Definition quoted from Russell &amp; Norvig,
+      <em>AI: A Modern Approach</em>. Simplified &amp; illustrated for study.</p>
+  </section>
+
+</div>
+</div>
+</body>
+</html>
