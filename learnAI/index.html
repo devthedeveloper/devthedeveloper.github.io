@@ -20,7 +20,7 @@
     --ink:#233252;         /* ballpoint blue-black */
     --ink-soft:#3c4a66;
     --pencil:#6c7079;
-    --red:#c75450;         /* pen red */
+    --red:#b23c38;         /* pen red */
     --hl-yellow:#fbe488;
     --hl-mint:#b9e7c9;
     --hl-blue:#bcdcf3;
@@ -54,7 +54,7 @@
   }
   :root[data-theme="light"]{
     --paper:#f7f6f0;--paper-2:#fdfdf9;--rule:#cddcea;--margin:#e6a6a2;--ink:#233252;--ink-soft:#3c4a66;
-    --pencil:#6c7079;--red:#c75450;--hl-yellow:#fbe488;--hl-mint:#b9e7c9;--hl-blue:#bcdcf3;--sticky:#fff3b0;
+    --pencil:#6c7079;--red:#b23c38;--hl-yellow:#fbe488;--hl-mint:#b9e7c9;--hl-blue:#bcdcf3;--sticky:#fff3b0;
     --sticky-2:#c8ecd4;--tape:rgba(200,190,150,.45);--shadow:rgba(40,45,60,.18);--box:#fffef9;
   }
   :root[data-theme="dark"]{
@@ -88,7 +88,11 @@
     content:"";position:absolute;top:0;bottom:0;left:clamp(34px,7vw,62px);
     width:2px;background:var(--margin);opacity:.7;
   }
-  @media (max-width:560px){ .sheet::before{display:none} }
+  @media (max-width:560px){
+    .sheet::before{display:none}
+    figure.fig{overflow-x:auto}
+    figure.fig svg{min-width:498px}
+  }
 
   h1,h2,h3{font-family:var(--hand);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
   p{margin:.5em 0}
@@ -200,6 +204,12 @@
   a.src{color:var(--ink-soft)}
   .footnote{color:var(--pencil);font-size:13.5px;margin-top:8px}
 
+  .nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
+  .nav a{font-family:var(--hand);text-decoration:none;color:var(--ink-soft);border:2px solid var(--ink-soft);
+    border-radius:18px 12px 18px 12px / 12px 18px 12px 18px;padding:3px 14px;font-size:14px;transition:transform .1s}
+  .nav a:hover{transform:translateY(-1px)}
+  .nav a.here{background:var(--red);color:var(--paper-2);border-color:var(--red)}
+  .nav .spacer{flex:1}
   svg text{font-family:var(--hand)}
   @media (prefers-reduced-motion:no-preference){
     .qa details[open] .ans{animation:fade .3s ease}
@@ -221,6 +231,12 @@
 
 <div class="page-bg">
 <div class="sheet">
+
+  <nav class="nav">
+    <a class="here" href="./">📓 Ch.1 · What is an Agent</a>
+    <a href="ch2/">🧠 Ch.2 · LLMs</a>
+    <span class="spacer"></span>
+  </nav>
 
   <header class="head">
     <span class="ch">Chapter 1 · Introduction</span>
@@ -684,6 +700,11 @@
     <p class="footnote">Notes based on <em>An Illustrated Guide to AI Agents</em>, Ch. 1 (Early Release) —
       Grootendorst &amp; Alammar, O'Reilly. Definition quoted from Russell &amp; Norvig,
       <em>AI: A Modern Approach</em>. Simplified &amp; illustrated for study.</p>
+
+    <nav class="nav" style="margin-top:26px">
+      <a href="ch2/">Next → Ch.2 · Large Language Models 🧠</a>
+      <span class="spacer"></span>
+    </nav>
   </section>
 
 </div>

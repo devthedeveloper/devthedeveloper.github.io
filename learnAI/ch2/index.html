@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Beginner-friendly handwritten-style study notes with hand-drawn diagrams for Chapter 2 (Large Language Models) of An Illustrated Guide to AI Agents, plus an interview cheat-sheet.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="AI Agents - Chapter 2: Large Language Models (Handwritten Notes)">
+<meta property="og:description" content="Simple illustrated study notes on how LLMs work: tokens, training, the Transformer, attention & Mixture-of-Experts.">
+<style>*{margin:0;padding:0}html{-webkit-text-size-adjust:100%}</style>
+<title>AI Agents · Ch.2 LLMs — Handwritten Notes</title>
+<style>
+  :root{
+    --paper:#f7f6f0;--paper-2:#fdfdf9;--rule:#cddcea;--margin:#e6a6a2;
+    --ink:#233252;--ink-soft:#3c4a66;--pencil:#6c7079;--red:#b23c38;
+    --hl-yellow:#fbe488;--hl-mint:#b9e7c9;--hl-blue:#bcdcf3;
+    --sticky:#fff3b0;--sticky-2:#c8ecd4;--tape:rgba(200,190,150,.45);
+    --shadow:rgba(40,45,60,.18);--box:#fffef9;
+    --hand:"Segoe Print","Bradley Hand","Chalkboard SE","Comic Sans MS","Comic Sans",cursive;
+    --mono:"Courier New",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#213029;--paper-2:#25352d;--rule:#33463c;--margin:#7d5b57;
+      --ink:#f1ede1;--ink-soft:#d7d3c6;--pencil:#a6b0a4;--red:#f0a49c;
+      --hl-yellow:#6a6330;--hl-mint:#3a5c46;--hl-blue:#2f4f63;
+      --sticky:#4a4526;--sticky-2:#33513f;--tape:rgba(190,180,140,.28);
+      --shadow:rgba(0,0,0,.4);--box:#28382f;
+    }
+  }
+  :root[data-theme="light"]{
+    --paper:#f7f6f0;--paper-2:#fdfdf9;--rule:#cddcea;--margin:#e6a6a2;--ink:#233252;--ink-soft:#3c4a66;
+    --pencil:#6c7079;--red:#b23c38;--hl-yellow:#fbe488;--hl-mint:#b9e7c9;--hl-blue:#bcdcf3;--sticky:#fff3b0;
+    --sticky-2:#c8ecd4;--tape:rgba(200,190,150,.45);--shadow:rgba(40,45,60,.18);--box:#fffef9;
+  }
+  :root[data-theme="dark"]{
+    --paper:#213029;--paper-2:#25352d;--rule:#33463c;--margin:#7d5b57;--ink:#f1ede1;--ink-soft:#d7d3c6;
+    --pencil:#a6b0a4;--red:#f0a49c;--hl-yellow:#6a6330;--hl-mint:#3a5c46;--hl-blue:#2f4f63;--sticky:#4a4526;
+    --sticky-2:#33513f;--tape:rgba(190,180,140,.28);--shadow:rgba(0,0,0,.4);--box:#28382f;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0}
+  .page-bg{background:var(--paper);color:var(--ink);font-family:var(--hand);line-height:1.7;min-height:100vh;
+    padding:clamp(14px,4vw,48px) clamp(10px,3vw,32px) 80px;}
+  .sheet{max-width:920px;margin:0 auto;
+    background:repeating-linear-gradient(var(--paper-2) 0 37px, var(--rule) 37px 38px);
+    background-attachment:local;border-radius:6px;
+    box-shadow:0 8px 30px var(--shadow), 0 1px 0 rgba(255,255,255,.2) inset;
+    position:relative;padding:clamp(26px,5vw,60px) clamp(20px,5vw,58px) 70px;overflow:hidden;}
+  .sheet::before{content:"";position:absolute;top:0;bottom:0;left:clamp(34px,7vw,62px);width:2px;background:var(--margin);opacity:.7;}
+  @media (max-width:560px){
+    .sheet::before{display:none}
+    figure.fig{overflow-x:auto}
+    figure.fig svg{min-width:498px}
+  }
+
+  h1,h2,h3{font-family:var(--hand);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+  p{margin:.5em 0}
+
+  /* nav pills */
+  .nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;align-items:center}
+  .nav a{font-family:var(--hand);text-decoration:none;color:var(--ink-soft);border:2px solid var(--ink-soft);
+    border-radius:18px 12px 18px 12px / 12px 18px 12px 18px;padding:3px 14px;font-size:14px;transition:transform .1s}
+  .nav a:hover{transform:translateY(-1px)}
+  .nav a.here{background:var(--red);color:var(--paper-2);border-color:var(--red)}
+  .nav .spacer{flex:1}
+
+  .head{position:relative;margin-bottom:14px}
+  .head h1{font-size:clamp(28px,6.5vw,50px);letter-spacing:.5px;color:var(--ink)}
+  .head .ch{color:var(--red);display:block;font-size:clamp(14px,3.4vw,19px);letter-spacing:2px;text-transform:uppercase}
+  .credit{color:var(--pencil);font-size:15px;margin-top:2px}
+  .credit em{color:var(--ink-soft);font-style:normal;border-bottom:2px dotted var(--pencil)}
+
+  .bigidea{margin:22px 0 30px;padding:16px 20px;background:var(--box);border:2.5px solid var(--ink);
+    border-radius:16px 9px 20px 8px / 9px 18px 10px 20px;box-shadow:3px 4px 0 var(--shadow);font-size:clamp(17px,3.6vw,21px);}
+  .bigidea b{color:var(--red)}
+
+  section{margin:38px 0}
+  .sec-num{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;margin-right:10px;flex:none;
+    border:2.5px solid var(--red);color:var(--red);border-radius:50% 48% 52% 50% / 50% 52% 48% 50%;font-size:20px;transform:rotate(-4deg);}
+  h2.sec{display:flex;align-items:center;font-size:clamp(22px,4.8vw,32px);color:var(--ink);gap:2px;margin-bottom:6px}
+  h3.sub{font-size:clamp(18px,4vw,23px);color:var(--ink-soft);margin:22px 0 4px;display:flex;align-items:center;gap:8px}
+  h3.sub::before{content:"▸";color:var(--red);font-size:.9em}
+
+  .lead{font-size:clamp(16px,3.4vw,18px)}
+  ul.notes{list-style:none;padding-left:6px;margin:8px 0}
+  ul.notes li{position:relative;padding-left:26px;margin:7px 0;font-size:clamp(15.5px,3.3vw,17.5px)}
+  ul.notes li::before{content:"→";position:absolute;left:0;color:var(--red);font-weight:700}
+
+  mark{background:transparent;color:inherit;background-image:linear-gradient(transparent 52%, var(--hl-yellow) 52%, var(--hl-yellow) 92%, transparent 92%);padding:0 2px;}
+  mark.mint{background-image:linear-gradient(transparent 52%, var(--hl-mint) 52%, var(--hl-mint) 92%, transparent 92%)}
+  mark.blue{background-image:linear-gradient(transparent 52%, var(--hl-blue) 52%, var(--hl-blue) 92%, transparent 92%)}
+  .red{color:var(--red)}
+  b,strong{color:var(--ink)}
+
+  .def{background:var(--box);border:2.5px dashed var(--ink-soft);border-radius:12px 18px 10px 16px / 16px 10px 18px 12px;
+    padding:14px 18px;margin:16px 0;box-shadow:2px 3px 0 var(--shadow);}
+  .def .tag{display:inline-block;transform:rotate(-2deg);background:var(--red);color:var(--paper-2);padding:1px 12px;border-radius:20px;font-size:14px;letter-spacing:1px;margin-bottom:6px}
+
+  .sticky{position:relative;background:var(--sticky);color:var(--ink);padding:16px 18px 18px;margin:20px 0;
+    box-shadow:3px 5px 12px var(--shadow);transform:rotate(-1.4deg);font-size:16px;}
+  .sticky.g{background:var(--sticky-2);transform:rotate(1.2deg)}
+  .sticky::before{content:"";position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-3deg);width:96px;height:22px;background:var(--tape);border-radius:2px}
+  .sticky .t{display:block;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:3px}
+  .sticky.g .t{color:var(--ink-soft)}
+
+  .analogy{display:flex;gap:12px;align-items:flex-start;background:var(--box);border-left:5px solid var(--hl-yellow);
+    border-radius:6px;padding:11px 15px;margin:14px 0;font-size:16px;box-shadow:1px 2px 6px var(--shadow)}
+  .analogy .em{font-size:26px;line-height:1;flex:none}
+
+  .tip{display:flex;gap:11px;align-items:flex-start;border:2px solid var(--hl-blue);
+    background:color-mix(in srgb,var(--hl-blue) 22%, var(--box));border-radius:10px 14px 9px 13px;padding:11px 15px;margin:14px 0;font-size:15.5px}
+  .tip .em{font-size:22px;flex:none}
+  .tip b{color:var(--red)}
+
+  figure.fig{margin:22px 0;background:var(--box);border:2.5px solid var(--ink);
+    border-radius:14px 10px 16px 9px / 9px 16px 10px 14px;box-shadow:3px 5px 0 var(--shadow);padding:16px 14px 6px;overflow:hidden}
+  figure.fig svg{display:block;width:100%;height:auto}
+  figcaption{font-family:var(--hand);color:var(--pencil);font-size:14px;text-align:center;padding:6px 8px 4px}
+  figcaption b{color:var(--red)}
+
+  code,.mono{font-family:var(--mono);font-size:.9em;background:color-mix(in srgb,var(--ink) 10%, var(--box));padding:1px 6px;border-radius:5px;color:var(--ink)}
+
+  /* part banner */
+  .part{display:flex;align-items:center;gap:14px;margin:44px 0 8px}
+  .part .lbl{font-size:clamp(20px,4.5vw,26px);color:var(--paper-2);background:var(--ink);padding:4px 16px;
+    border-radius:14px 8px 14px 8px;transform:rotate(-1deg);box-shadow:3px 4px 0 var(--shadow)}
+  .part .sub{color:var(--pencil);font-size:15px}
+  .part.two .lbl{background:var(--red)}
+
+  .qa{border:2.5px solid var(--ink);border-radius:14px 10px 14px 10px;background:var(--box);padding:6px 18px;margin:16px 0;box-shadow:3px 5px 0 var(--shadow)}
+  .qa details{border-bottom:1.5px dashed var(--rule);padding:10px 0}
+  .qa details:last-child{border-bottom:none}
+  .qa summary{cursor:pointer;font-size:17px;color:var(--ink);list-style:none;display:flex;gap:10px;align-items:flex-start}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary .q{color:var(--red);font-weight:700;flex:none}
+  .qa summary::after{content:"+";margin-left:auto;color:var(--red);font-size:22px;line-height:1}
+  .qa details[open] summary::after{content:"–"}
+  .qa .ans{padding:8px 4px 2px 28px;font-size:16px;color:var(--ink-soft)}
+
+  .divider{display:flex;align-items:center;gap:12px;color:var(--pencil);margin:34px 0;font-size:15px}
+  .divider::before,.divider::after{content:"";height:2px;flex:1;background:var(--rule)}
+  .footnote{color:var(--pencil);font-size:13.5px;margin-top:8px}
+
+  svg text{font-family:var(--hand)}
+  @media (prefers-reduced-motion:no-preference){
+    .qa details[open] .ans{animation:fade .3s ease}
+    @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="sketch"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/></filter>
+    <filter id="sketch2"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="12" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="var(--red)"/></marker>
+  </defs>
+</svg>
+
+<div class="page-bg">
+<div class="sheet">
+
+  <nav class="nav">
+    <a href="../">📓 Ch.1 · What is an Agent</a>
+    <a class="here" href="./">🧠 Ch.2 · LLMs</a>
+    <span class="spacer"></span>
+  </nav>
+
+  <header class="head">
+    <span class="ch">Chapter 2 · Large Language Models</span>
+    <h1>How the "brain" actually works 🧠</h1>
+    <p class="credit">From <em>An Illustrated Guide to AI Agents</em> — Jay Alammar &amp; Maarten Grootendorst (O'Reilly, Early Release)</p>
+  </header>
+
+  <div class="bigidea">
+    <b>The one-line version:</b> An <b>LLM</b> is a machine that <mark>reads text as little chunks (tokens) and
+    predicts the next chunk</mark>, one at a time. This chapter opens the hood: <mark class="mint">how it's built,
+    how it's trained, and what's inside it</mark> (the Transformer).
+  </div>
+
+  <div class="sticky">
+    <span class="t">How to read this</span>
+    The book splits this chapter into <b>Part 1</b> (the must-know basics — that's most of these notes) and
+    <b>Part 2</b> (an optional deep dive into the maths). For your interview, <b>Part 1 is the priority.</b>
+    I've clearly marked where Part 2 begins so you can stop there if your head is full. 🙂
+  </div>
+
+  <div class="part"><span class="lbl">PART 1</span><span class="sub">What you should know about LLMs</span></div>
+
+  <!-- 1 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">1</span> The LLM's job inside an agent</h2>
+    <ul class="notes">
+      <li>The LLM sits in the <b>middle</b>, acting as a <mark>bridge between the user and the environment</mark>.</li>
+      <li>It does four jobs: <b>read</b> the user's question → <b>choose</b> an action → <b>read</b> the result that
+        comes back → <b>reply</b> to the user.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="The LLM as a bridge between the user on the left and the environment on the right">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="20" y="72" width="120" height="64" rx="14" stroke="var(--ink)"/>
+          <rect x="258" y="60" width="130" height="88" rx="16" stroke="var(--red)"/>
+          <rect x="510" y="72" width="112" height="64" rx="14" stroke="var(--ink)"/>
+          <path d="M142 92 L256 82" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M256 126 L142 118" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M390 82 L508 92" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M508 118 L390 126" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="80" y="100" font-size="15">👤 USER</text>
+          <text x="80" y="122" font-size="12" fill="var(--pencil)">asks / reads</text>
+          <text x="323" y="98" font-size="16" fill="var(--red)">LLM</text>
+          <text x="323" y="120" font-size="12" fill="var(--pencil)">the brain</text>
+          <text x="566" y="98" font-size="14">🌍 WORLD</text>
+          <text x="566" y="120" font-size="11" fill="var(--pencil)">tools / search</text>
+          <text x="200" y="176" font-size="12" fill="var(--pencil)">question ↔ answer</text>
+          <text x="450" y="176" font-size="12" fill="var(--pencil)">action ↔ result</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 1.</b> Example: you ask a question → LLM calls web-search → reads the result → answers you.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">2</span> Tokens in, tokens out</h2>
+    <ul class="notes">
+      <li>LLMs don't see whole words — they see <span class="red"><b>tokens</b></span>: little chunks that can be a
+        word, <mark>part of a word</mark>, a number, or punctuation.</li>
+      <li>Example: the book shows <code>flamingos</code> becoming <b>two</b> tokens → <code>flamingo</code> + <code>s</code>
+        (the exact split depends on the tokenizer). Chopping words into chunks lets the model handle words it's never seen.</li>
+      <li>It generates the answer <b>one token at a time</b>: predict a token → stick it onto the end → read the whole
+        thing again → predict the next. This self-feeding loop is called <span class="red"><b>autoregression</b></span>.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 220" role="img" aria-label="Text split into tokens, then generated one token at a time and fed back">
+        <g filter="url(#sketch2)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="18" y="28" width="604" height="52" rx="12" stroke="var(--ink-soft)"/>
+          <rect x="270" y="120" width="110" height="60" rx="14" stroke="var(--red)"/>
+          <rect x="470" y="126" width="150" height="48" rx="12" stroke="var(--ink)"/>
+          <path d="M320 80 L320 118" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M380 150 L468 150" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M545 174 C548 210 250 214 210 82" marker-end="url(#arrow)" stroke="var(--pencil)" stroke-dasharray="5 6"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle" font-size="14">
+          <text x="55" y="59">[I]</text><text x="120" y="59">[ love]</text>
+          <text x="245" y="59">[ flamingo]</text><text x="350" y="59">[s]</text>
+          <text x="480" y="59" fill="var(--pencil)">← "flamingos" = 2 tokens</text>
+          <text x="325" y="146" font-size="15" fill="var(--red)">LLM</text>
+          <text x="325" y="166" font-size="11" fill="var(--pencil)">predict next</text>
+          <text x="545" y="155" font-size="15">"They"</text>
+          <text x="330" y="205" font-size="12" fill="var(--pencil)">append the new token &amp; repeat (autoregression)</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 2.</b> Split into tokens → predict → append → repeat. (Same idea as Ch.1's autocomplete.)</figcaption>
+    </figure>
+    <div class="analogy">
+      <span class="em">🧱</span>
+      <div><b>Analogy:</b> Tokens are like <em>LEGO bricks for language</em> — the model builds every sentence
+      brick-by-brick, checking the whole tower so far before adding the next brick.</div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">3</span> The 3 formats that turn an LLM into an agent</h2>
+    <p class="lead">A raw LLM just continues text. To make it behave like a helpful, tool-using assistant, we wrap its
+    input in special formats — ones the model is specifically <b>trained</b> (in post-training, §4) to understand and produce:</p>
+
+    <h3 class="sub">System prompt</h3>
+    <ul class="notes">
+      <li>A <mark>privileged instruction placed <em>before</em> the user's message</mark> that shapes behaviour and
+        <b>takes precedence</b> over what users ask.</li>
+      <li>Set by whoever <b>deploys</b> the model (e.g. a company), not baked in during training — so you can change
+        behaviour without retraining.</li>
+    </ul>
+    <div class="analogy">
+      <span class="em">📋</span>
+      <div><b>Analogy:</b> The system prompt is the <em>employee handbook / standing orders</em> pinned above the
+      desk — the rules the assistant follows no matter who walks up.</div>
+    </div>
+
+    <h3 class="sub">Multi-turn conversation</h3>
+    <ul class="notes">
+      <li>Formats the chat as <b>user ↔ assistant</b> turns so the model can see <mark>who said what</mark> across a
+        longer conversation. (A first taste of "memory" — proper memory is Ch.4.)</li>
+    </ul>
+
+    <h3 class="sub">Tool-use</h3>
+    <ul class="notes">
+      <li>Available tools are usually listed in the <b>system prompt</b>. Instead of answering, the LLM can
+        <mark class="mint">emit a structured tool call</mark> like <code>web_search("Toronto Zoo flamingos")</code>.</li>
+      <li>The <b>agent wrapper</b> spots that pattern, runs the real tool, and feeds the result back in. (Full detail = Ch.5.)</li>
+      <li><b>How it tells them apart:</b> the system / user / assistant roles &amp; tool calls are marked by
+        <mark>special tokens</mark> in a fixed chat format (e.g. OpenAI's <em>Harmony</em>) — that's how the model
+        knows <em>your</em> question from <em>its own</em> instructions.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 210" role="img" aria-label="A stacked input of system prompt, chat history and user question producing a tool call">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="20" y="20" width="300" height="40" rx="10" stroke="var(--red)"/>
+          <rect x="20" y="70" width="300" height="40" rx="10" stroke="var(--ink-soft)"/>
+          <rect x="20" y="120" width="300" height="40" rx="10" stroke="var(--ink)"/>
+          <rect x="400" y="58" width="100" height="64" rx="14" stroke="var(--red)"/>
+          <rect x="400" y="150" width="220" height="44" rx="10" stroke="var(--ink)"/>
+          <path d="M322 90 L398 90" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M450 122 L450 148" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" font-size="13">
+          <text x="34" y="45" fill="var(--red)">SYSTEM PROMPT (rules + tools)</text>
+          <text x="34" y="95" fill="var(--pencil)">chat history (turn by turn)</text>
+          <text x="34" y="145">user's question ❓</text>
+          <text x="450" y="86" font-size="15" fill="var(--red)" text-anchor="middle">LLM</text>
+          <text x="450" y="104" font-size="10" fill="var(--pencil)" text-anchor="middle">decides</text>
+          <text x="510" y="177" font-family="var(--mono)" font-size="12" text-anchor="middle">web_search("…flamingos")</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 3.</b> Everything is just text flowing in; a tool call is just text flowing out.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">4</span> How an LLM is trained (2 phases)</h2>
+    <div class="def">
+      <span class="tag">FIRST — WHAT'S A "WEIGHT"?</span>
+      <p style="margin:0;font-size:17px">An LLM is a giant <b>neural network</b>. Its know-how lives in
+      millions-to-billions of numbers called <mark>weights</mark> (aka <b>parameters</b>) — think tiny dials.
+      <b>Training = tweaking those dials</b> so its guesses improve. The "<b>Large</b>" in LLM literally means
+      <em>how many</em> of them there are.</p>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Training pipeline: pre-training to base model, then SFT and RL to final model">
+        <g filter="url(#sketch2)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="14" y="52" width="140" height="52" rx="13" stroke="var(--ink-soft)"/>
+          <rect x="196" y="52" width="120" height="52" rx="13" stroke="var(--ink)"/>
+          <rect x="356" y="52" width="120" height="52" rx="13" stroke="var(--ink-soft)"/>
+          <rect x="516" y="52" width="110" height="52" rx="13" stroke="var(--red)"/>
+          <path d="M154 78 L194 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M316 78 L354 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M476 78 L514 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="84" y="74" font-size="13">PRE-TRAIN</text><text x="84" y="92" font-size="10" fill="var(--pencil)">read everything</text>
+          <text x="256" y="74" font-size="13">BASE MODEL</text><text x="256" y="92" font-size="10" fill="var(--pencil)">raw knowledge</text>
+          <text x="416" y="74" font-size="13">SFT + RL</text><text x="416" y="92" font-size="10" fill="var(--pencil)">post-training</text>
+          <text x="571" y="74" font-size="13" fill="var(--red)">FINAL</text><text x="571" y="92" font-size="10" fill="var(--pencil)">helpful model</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 4.</b> Pre-training builds raw knowledge; post-training makes it helpful &amp; well-behaved.</figcaption>
+    </figure>
+
+    <h3 class="sub">Phase 1 — Pre-training (language modelling)</h3>
+    <ul class="notes">
+      <li>Take mountains of text (web, books, code), <mark>hide the next word, make the model guess it</mark>.</li>
+      <li>Wrong guess → measure the error (the <b>loss</b>) → nudge the model's <b>weights</b> to do better. Repeat
+        <b>billions</b> of times.</li>
+      <li>Result = a <span class="red"><b>base model</b></span> (the landmark one was OpenAI's <b>GPT-3, 2020</b>).
+        It's knowledgeable but hard to steer.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Next token prediction training: model guesses wrong, compares to correct word, updates weights">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="20" y="50" width="230" height="50" rx="12" stroke="var(--ink-soft)"/>
+          <rect x="300" y="46" width="96" height="58" rx="14" stroke="var(--red)"/>
+          <rect x="448" y="30" width="170" height="40" rx="10" stroke="var(--ink)"/>
+          <rect x="448" y="82" width="170" height="40" rx="10" stroke="var(--red)" stroke-dasharray="6 5"/>
+          <path d="M252 75 L298 75" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M396 62 L446 52" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M396 88 L446 100" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" font-size="13">
+          <text x="34" y="80">"…large language ___"</text>
+          <text x="348" y="72" font-size="14" fill="var(--red)" text-anchor="middle">LLM</text>
+          <text x="533" y="55" text-anchor="middle">guess: "beauty" ✗</text>
+          <text x="533" y="107" text-anchor="middle" fill="var(--red)">real: "models" ✓</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 5.</b> Compare guess vs. truth → update weights. Do it billions of times = a base model.</figcaption>
+    </figure>
+    <div class="analogy">
+      <span class="em">📚</span>
+      <div><b>Analogy:</b> A lifetime of <em>fill-in-the-blank</em> exercises over the whole internet. Get enough
+      of them right and you've absorbed grammar, facts, code and reasoning patterns.</div>
+    </div>
+
+    <h3 class="sub">Phase 2 — Post-training (making it useful)</h3>
+    <p>The base model has raw talent but needs polishing. Two steps:</p>
+    <ul class="notes">
+      <li><b>① SFT (Supervised Fine-Tuning)</b>, aka <em>instruction-tuning</em>: show it example
+        <mark>prompt → ideal answer</mark> pairs so it learns to follow instructions. Neat detail: the prompt is fed
+        in as context but <b>only the answer part is graded</b> during training.</li>
+      <li><span class="red"><b>Why not just SFT?</b></span> SFT gets the model <em>following instructions</em>, but
+        can't capture what makes an answer genuinely <em>good</em> (helpful, accurate, well-reasoned). That's RL's job.</li>
+      <li><b>② Reinforcement Learning (RL)</b>: instead of showing the perfect answer, we <mark class="mint">score
+        the answers it produces</mark> (a <b>reward</b>) and push it toward higher scores. Two flavours 👇</li>
+    </ul>
+
+    <figure class="fig">
+      <svg viewBox="0 0 640 190" role="img" aria-label="RLHF uses human-preferred versus rejected answers; RLVR uses an automatic verifier">
+        <g filter="url(#sketch2)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="16" y="18" width="300" height="150" rx="14" stroke="var(--ink-soft)"/>
+          <rect x="330" y="18" width="294" height="150" rx="14" stroke="var(--ink-soft)"/>
+          <rect x="40" y="86" width="115" height="34" rx="9" stroke="var(--red)"/>
+          <rect x="40" y="128" width="115" height="30" rx="9" stroke="var(--ink)"/>
+          <rect x="356" y="96" width="150" height="52" rx="12" stroke="var(--red)"/>
+        </g>
+        <g fill="var(--ink)">
+          <text x="166" y="44" font-size="15" fill="var(--red)">RLHF</text>
+          <text x="166" y="62" font-size="11" fill="var(--pencil)">humans rate answers</text>
+          <text x="97" y="107" font-size="12" text-anchor="middle">👍 preferred</text>
+          <text x="97" y="148" font-size="12" text-anchor="middle">👎 rejected</text>
+          <text x="185" y="120" font-size="11" fill="var(--pencil)">learn the</text>
+          <text x="185" y="136" font-size="11" fill="var(--pencil)">favourite</text>
+          <text x="477" y="44" font-size="15" fill="var(--red)">RLVR</text>
+          <text x="477" y="62" font-size="11" fill="var(--pencil)">automatic verifier checks</text>
+          <text x="431" y="120" font-size="12" text-anchor="middle">✅ right format?</text>
+          <text x="431" y="138" font-size="12" text-anchor="middle">✅ correct answer?</text>
+          <text x="560" y="120" font-size="11" fill="var(--pencil)">maths/code</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 6.</b> <b>RLHF</b> = a human taste-test (preferred vs rejected). <b>RLVR</b> = an automatic answer-key (great when right/wrong is objective).</figcaption>
+    </figure>
+    <ul class="notes">
+      <li><b>RLHF</b> (from Human Feedback): humans (or a "reward model" trained on their preferences) mark one answer
+        as <b>preferred</b>, another <b>rejected</b>. Model shifts toward the preferred style.</li>
+      <li><b>RLVR</b> (with Verifiable Rewards): a program checks the answer automatically — did it use the right
+        format? Is the maths correct? Scales beautifully where there's a clear right answer.</li>
+    </ul>
+
+    <h3 class="sub">GRPO — a popular RLVR recipe</h3>
+    <p style="margin:2px 0 0;color:var(--pencil)">Full name: <b>G</b>roup <b>R</b>elative <b>P</b>olicy <b>O</b>ptimization.</p>
+    <ul class="notes">
+      <li>Ask the model the same question and let it write a <mark>whole group of answers at once</mark> (e.g. 5),
+        using a bit of randomness so they differ.</li>
+      <li>Score each: e.g. <b>format reward 0.3</b> (used the right tags?) + <b>accuracy reward 0.7</b> (answer correct?).</li>
+      <li>Reward is judged <span class="red"><b>relative to the group</b></span> — reinforce the answers that beat
+        their siblings. (That's the "Group" in GRPO. Used to train DeepSeek-R1 — Ch.3.)</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="GRPO generates five answers, scores each, and updates toward the higher-scoring ones">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.2" stroke-linecap="round">
+          <rect x="20" y="66" width="90" height="44" rx="12" stroke="var(--red)"/>
+          <path d="M112 88 L150 88" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="none" stroke="var(--ink)" stroke-width="2" filter="url(#sketch2)">
+          <rect x="156" y="14" width="150" height="26" rx="8"/>
+          <rect x="156" y="46" width="150" height="26" rx="8"/>
+          <rect x="156" y="78" width="150" height="26" rx="8"/>
+          <rect x="156" y="110" width="150" height="26" rx="8"/>
+          <rect x="156" y="142" width="150" height="24" rx="8"/>
+        </g>
+        <g fill="var(--ink)" font-size="12">
+          <text x="65" y="84" font-size="13" fill="var(--red)" text-anchor="middle">1 Q</text>
+          <text x="65" y="100" font-size="10" fill="var(--pencil)" text-anchor="middle">×5 tries</text>
+          <text x="170" y="31">answer ①</text><text x="330" y="31" fill="var(--red)">0.2</text>
+          <text x="170" y="63">answer ②</text><text x="330" y="63" fill="var(--red)">0.9 ★</text>
+          <text x="170" y="95">answer ③</text><text x="330" y="95" fill="var(--red)">0.0</text>
+          <text x="170" y="127">answer ④</text><text x="330" y="127" fill="var(--red)">1.0 ★</text>
+          <text x="170" y="158">answer ⑤</text><text x="330" y="158" fill="var(--red)">0.3</text>
+          <text x="470" y="80" font-size="13">→ update toward</text>
+          <text x="470" y="100" font-size="13">the ★ winners</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 7.</b> Like <b>grading on a curve within your own attempts</b> — reward the answers that beat the rest.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">5</span> Inside the Transformer (the anatomy)</h2>
+    <p class="lead">Nearly all LLMs since ~2020 use the <b>Transformer decoder</b>. It has <b>three</b> big parts:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Transformer anatomy: tokenizer, stack of blocks, LM head producing probabilities">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="18" y="60" width="120" height="52" rx="13" stroke="var(--ink-soft)"/>
+          <rect x="188" y="40" width="170" height="92" rx="14" stroke="var(--red)"/>
+          <rect x="210" y="52" width="126" height="20" rx="6" stroke="var(--ink)"/>
+          <rect x="210" y="78" width="126" height="20" rx="6" stroke="var(--ink)"/>
+          <rect x="210" y="104" width="126" height="18" rx="6" stroke="var(--ink)"/>
+          <rect x="408" y="60" width="120" height="52" rx="13" stroke="var(--ink-soft)"/>
+          <rect x="560" y="60" width="66" height="52" rx="12" stroke="var(--ink)"/>
+          <path d="M138 86 L186 86" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M358 86 L406 86" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M528 86 L558 86" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="78" y="82" font-size="13">TOKENIZER</text><text x="78" y="100" font-size="10" fill="var(--pencil)">text→tokens</text>
+          <text x="273" y="34" font-size="12" fill="var(--red)">Transformer blocks ×N</text>
+          <text x="273" y="66" font-size="10">block 1</text><text x="273" y="92" font-size="10">block 2 …</text><text x="273" y="117" font-size="10">block N</text>
+          <text x="468" y="82" font-size="14">LM HEAD</text><text x="468" y="100" font-size="10" fill="var(--pencil)">→ probabilities</text>
+          <text x="593" y="82" font-size="11">next</text><text x="593" y="96" font-size="11">token</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 8.</b> Tokenizer → stack of blocks (where the thinking happens) → LM head → next-token pick.</figcaption>
+    </figure>
+    <ul class="notes">
+      <li><b>Tokenizer</b> — chops text into tokens. Each token has an ID from a fixed <b>vocabulary</b> (say ~50,000),
+        and each ID maps to an <mark>embedding</mark> = a list of numbers the model can compute with. The vocabulary also
+        holds <b>special tokens</b> (like <code>&lt;|start|&gt;</code>) that mark the chat format from §3.</li>
+      <li><b>Transformer blocks</b> — a tall stack; nearly all the actual "thinking" happens here (Section 6).</li>
+      <li><b>LM head</b> — turns the final result into a <mark class="mint">probability score for every token</mark> in
+        the vocabulary. High score = likely next token.</li>
+    </ul>
+
+    <h3 class="sub">Picking the next token: temperature</h3>
+    <ul class="notes">
+      <li>The rule for choosing from those probabilities is the <b>decoding strategy</b>.</li>
+      <li><span class="red"><b>Temperature 0</b></span> = always pick the single highest-probability token (safe, repetitive).</li>
+      <li><b>Higher temperature</b> = <em>sampling</em>: lower-probability tokens get a real chance (more varied/creative).</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="LM head probability bars and a temperature dial">
+        <g filter="url(#sketch2)" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round">
+          <line x1="60" y1="120" x2="430" y2="120"/>
+          <rect x="80" y="40" width="46" height="80" rx="4" fill="var(--hl-yellow)"/>
+          <rect x="160" y="78" width="46" height="42" rx="4"/>
+          <rect x="240" y="92" width="46" height="28" rx="4"/>
+          <rect x="320" y="104" width="46" height="16" rx="4"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle" font-size="12">
+          <text x="103" y="135">"From"</text><text x="103" y="34" fill="var(--red)">40%</text>
+          <text x="183" y="135">"the"</text><text x="263" y="135">"a"</text><text x="343" y="135">"Zyzzyva"</text>
+          <text x="540" y="55" font-size="13">🎚️ temp 0 → always "From"</text>
+          <text x="540" y="90" font-size="13">temp ↑ → sometimes others</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 9.</b> The LM head scores every word; temperature decides how adventurous the pick is.</figcaption>
+    </figure>
+    <div class="analogy">
+      <span class="em">🎲</span>
+      <div><b>Analogy:</b> A <em>weighted dice roll</em>. Temperature 0 = always play your strongest tile;
+      crank it up = you gamble on riskier, more surprising words.</div>
+    </div>
+
+    <h3 class="sub">Two ideas every agent builder must know</h3>
+    <ul class="notes">
+      <li><b>Context length</b> = how many tokens can flow through at once (the model's <mark>desk size / working
+        memory</mark>). Everything — system prompt + history + question + answer — must fit. Choosing what to keep
+        in that limited space is <span class="red"><b>context engineering</b></span> (recurring theme of the book).</li>
+      <li><b>Under the hood:</b> all tokens flow through the blocks in <mark>parallel "tracks,"</mark> but only the
+        <b>last</b> token's output is used to predict the next word. The earlier tokens' results don't change — which is
+        exactly why they can be reused 👇 (and the number of tracks = the context size).</li>
+      <li><b>KV-cache</b> (aka prompt / prefix caching) = after the first pass, the model <mark class="mint">saves its
+        work</mark> so each new token only needs a tiny bit of fresh computation. Huge speed &amp; cost win — a key lever
+        for agent developers (more in Ch.11).</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">6</span> Inside one block: memory + attention</h2>
+    <p class="lead">Every Transformer block has <b>two</b> parts working together:</p>
+    <figure class="fig">
+      <svg viewBox="0 0 560 150" role="img" aria-label="A Transformer block contains a self-attention layer and a feed-forward network">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="30" y="26" width="500" height="98" rx="16" stroke="var(--red)"/>
+          <rect x="60" y="52" width="200" height="48" rx="12" stroke="var(--ink)"/>
+          <rect x="300" y="52" width="200" height="48" rx="12" stroke="var(--ink)"/>
+          <path d="M262 76 L298 76" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle">
+          <text x="280" y="20" font-size="13" fill="var(--red)">one Transformer block</text>
+          <text x="160" y="74" font-size="14">① SELF-ATTENTION</text><text x="160" y="92" font-size="10" fill="var(--pencil)">gather context</text>
+          <text x="400" y="74" font-size="14">② FEED-FORWARD</text><text x="400" y="92" font-size="10" fill="var(--pencil)">recall facts</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 10.</b> Attention gathers <em>context</em>; the feed-forward network supplies <em>knowledge</em>.</figcaption>
+    </figure>
+
+    <h3 class="sub">The feed-forward network = the knowledge store</h3>
+    <ul class="notes">
+      <li>A big neural network that does the heavy lifting of prediction and appears to <mark>store facts learned in
+        training</mark>.</li>
+      <li>Give it <code>"The Shawshank"</code> → it predicts <code>"Redemption"</code>, because that's the most common
+        continuation it saw.</li>
+      <li><b>Model-picking heads-up:</b> this network comes in two styles — a single <b>dense</b> network, or a
+        <b>Mixture-of-Experts</b> (many small ones). It's a real choice when picking an open model — mechanics in Part 2 §9.</li>
+    </ul>
+
+    <h3 class="sub">Self-attention = understanding context</h3>
+    <ul class="notes">
+      <li>Word order and context carry meaning: <code>bank</code> = money-place or river-side? You only know from
+        context.</li>
+      <li>Self-attention lets each token <mark class="mint">look back at the most relevant earlier tokens</mark> to
+        figure out what's going on — e.g. resolving what <b>"it"</b> refers to.</li>
+      <li>It works in <b>two steps</b>: ① <b>score</b> how relevant each earlier token is, then ② <b>blend</b> their
+        info into the current token, weighted by those scores.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 130" role="img" aria-label="Self-attention resolving the pronoun it back to llama in a sentence">
+        <g fill="var(--ink)" text-anchor="middle" font-size="15">
+          <text x="70" y="60">The</text><text x="150" y="60">dog</text><text x="235" y="60">chased</text>
+          <text x="315" y="60">the</text><text x="400" y="60" fill="var(--red)">llama</text>
+          <text x="500" y="60">because</text><text x="590" y="60" fill="var(--red)">it…</text>
+        </g>
+        <g filter="url(#sketch2)" fill="none" stroke="var(--red)" stroke-width="2.4" stroke-linecap="round">
+          <path d="M588 70 C560 108 440 108 405 72" marker-end="url(#arrowRed)"/>
+        </g>
+        <text x="490" y="112" font-size="12" fill="var(--pencil)" text-anchor="middle">"it" attends back to "llama" 🔗</text>
+      </svg>
+      <figcaption><b>Fig 11.</b> Self-attention is how the model resolves "it" → the right earlier word.</figcaption>
+    </figure>
+    <div class="analogy">
+      <span class="em">🔗</span>
+      <div><b>Analogy:</b> It's <em>pronoun detective work</em> — to understand "it," you glance back at the sentence
+      and connect it to the noun that fits.</div>
+    </div>
+    <div class="sticky g">
+      <span class="t">If you stop here, you're interview-ready</span>
+      Tokens → predict next → trained by pre-training + SFT + RL → built from a <b>tokenizer + Transformer blocks
+      (attention + feed-forward) + LM head</b>. Part 2 below is bonus depth.
+    </div>
+  </section>
+
+  <div class="part two"><span class="lbl">PART 2</span><span class="sub">Optional deep dive — the machinery</span></div>
+
+  <!-- 7 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">7</span> How self-attention is actually computed: Q, K, V</h2>
+    <ul class="notes">
+      <li>Each token's vector is multiplied by three learned matrices to make three new vectors:
+        <b>Query</b>, <b>Key</b>, <b>Value</b>.</li>
+      <li><b>① Relevance scoring:</b> multiply the current token's <b>Query</b> by every token's <b>Key</b> →
+        a relevance score each, then <b>softmax</b> (turns the scores into percentages that add to 100%; the
+        √d<sub>k</sub> bit is just a scaling constant you can ignore for the intuition).</li>
+      <li><b>② Combine:</b> take a <mark>weighted sum of the <b>Value</b> vectors</mark>, weighted by those scores →
+        the enriched output for the current token.</li>
+    </ul>
+    <div class="analogy">
+      <span class="em">🔎</span>
+      <div><b>Analogy:</b> Like a search engine. Your <b>Query</b> ("what am I looking for?") is compared against every
+      document's <b>Key</b> ("what am I about?"); the best matches hand over their <b>Value</b> ("here's my info").</div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 640 150" role="img" aria-label="Query times Keys gives scores, scores times Values gives the output">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="20" y="56" width="70" height="44" rx="11" stroke="var(--red)"/>
+          <rect x="150" y="56" width="70" height="44" rx="11" stroke="var(--ink)"/>
+          <rect x="300" y="56" width="120" height="44" rx="11" stroke="var(--ink-soft)"/>
+          <rect x="470" y="56" width="70" height="44" rx="11" stroke="var(--ink)"/>
+          <rect x="560" y="56" width="66" height="44" rx="11" stroke="var(--red)"/>
+          <path d="M92 78 L148 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M222 78 L298 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M420 78 L468 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M542 78 L558 78" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" text-anchor="middle" font-size="13">
+          <text x="55" y="82" fill="var(--red)">Query</text>
+          <text x="185" y="82">Keys</text>
+          <text x="360" y="76">scores</text><text x="360" y="92" font-size="10" fill="var(--pencil)">(softmax)</text>
+          <text x="505" y="82">Values</text>
+          <text x="593" y="82" fill="var(--red)">out</text>
+          <text x="120" y="126" font-size="11" fill="var(--pencil)">① score relevance</text>
+          <text x="470" y="126" font-size="11" fill="var(--pencil)">② weighted blend</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 12.</b> Query·Keys → scores; scores·Values → the enriched output vector.</figcaption>
+    </figure>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">8</span> KV-cache &amp; making attention cheaper</h2>
+    <ul class="notes">
+      <li><b>Problem:</b> plain ("vanilla") attention <mark>recomputes the Keys &amp; Values for every earlier token at
+        every step</mark> — hugely wasteful as text grows.</li>
+      <li><b>Fix = KV-cache:</b> store the K &amp; V of past tokens and reuse them; only compute K &amp; V for the new
+        token. (Queries aren't cached — you only need the newest token's Query.)</li>
+      <li>Downside: the cache eats <b>memory</b>. So researchers invented leaner attention variants:</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 640 140" role="img" aria-label="Without cache every step recomputes keys and values; with cache only the new token is computed">
+        <g filter="url(#sketch2)" fill="none" stroke-width="2.2" stroke-linecap="round">
+          <rect x="20" y="30" width="270" height="90" rx="13" stroke="var(--ink-soft)"/>
+          <rect x="350" y="30" width="270" height="90" rx="13" stroke="var(--red)"/>
+          <rect x="44" y="66" width="30" height="30" rx="6" stroke="var(--ink)"/>
+          <rect x="84" y="66" width="30" height="30" rx="6" stroke="var(--ink)"/>
+          <rect x="124" y="66" width="30" height="30" rx="6" stroke="var(--ink)"/>
+          <rect x="374" y="66" width="30" height="30" rx="6" fill="var(--hl-blue)" stroke="var(--ink)"/>
+          <rect x="414" y="66" width="30" height="30" rx="6" fill="var(--hl-blue)" stroke="var(--ink)"/>
+          <rect x="454" y="66" width="30" height="30" rx="6" stroke="var(--red)"/>
+        </g>
+        <g fill="var(--ink)" font-size="12">
+          <text x="155" y="24" text-anchor="middle">vanilla: recompute ALL 🔁</text>
+          <text x="485" y="24" text-anchor="middle" fill="var(--red)">KV-cache: reuse + 1 new ⚡</text>
+          <text x="200" y="88" font-size="11" fill="var(--pencil)">every box redone</text>
+          <text x="512" y="82" font-size="11" fill="var(--pencil)">blue = cached</text>
+          <text x="512" y="98" font-size="11" fill="var(--red)">red = new only</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 13.</b> Don't re-read the whole book to write each new word — keep notes in the margin.</figcaption>
+    </figure>
+    <ul class="notes">
+      <li><b>GQA / MQA</b> (Grouped-Query / Multi-Query): share K &amp; V across attention heads → smaller cache, a
+        little less accurate.</li>
+      <li><b>MLA</b> (Multi-head Latent Attention, DeepSeek): cache a <mark>small compressed version</mark> of K &amp; V,
+        expand it back when needed — leaner <em>and</em> more <b>efficient</b> than GQA, while (being basically full
+        Multi-Head Attention) keeping accuracy high.</li>
+      <li><b>DSA</b> (DeepSeek Sparse Attention): a <b>lightning indexer</b> + <b>top-k selector</b> attend to only the
+        most relevant ~couple-thousand tokens instead of all of them.</li>
+    </ul>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <h2 class="sec"><span class="sec-num">9</span> Mixture of Experts (MoE)</h2>
+    <ul class="notes">
+      <li>Swap the one big feed-forward network for <mark>many smaller "expert" networks + a router</mark>.</li>
+      <li><b>Dense model</b> = every part runs for every token. <b>Sparse (MoE) model</b> = the <span class="red"><b>router</b></span>
+        sends each token to just a <b>few</b> experts.</li>
+      <li>Experts seem to specialise in fine-grained things (e.g. numbers vs verbs) — though exactly what they learn is
+        still fuzzy.</li>
+    </ul>
+    <figure class="fig">
+      <svg viewBox="0 0 560 170" role="img" aria-label="A router directs a token to a subset of expert networks">
+        <g filter="url(#sketch)" fill="none" stroke-width="2.4" stroke-linecap="round">
+          <rect x="40" y="66" width="90" height="44" rx="12" stroke="var(--red)"/>
+          <rect x="230" y="16" width="120" height="34" rx="10" fill="var(--hl-mint)" stroke="var(--ink)"/>
+          <rect x="230" y="60" width="120" height="34" rx="10" stroke="var(--ink)"/>
+          <rect x="230" y="104" width="120" height="34" rx="10" fill="var(--hl-mint)" stroke="var(--ink)"/>
+          <rect x="230" y="148" width="120" height="20" rx="8" stroke="var(--ink-soft)"/>
+          <path d="M132 82 C180 60 190 40 228 34" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+          <path d="M132 96 C180 120 190 124 228 121" marker-end="url(#arrow)" stroke="var(--ink-soft)"/>
+        </g>
+        <g fill="var(--ink)" font-size="13">
+          <text x="85" y="84" text-anchor="middle" fill="var(--red)">ROUTER</text>
+          <text x="85" y="100" text-anchor="middle" font-size="10" fill="var(--pencil)">picks few</text>
+          <text x="290" y="38" text-anchor="middle">expert 1 ✓</text>
+          <text x="290" y="82" text-anchor="middle" fill="var(--pencil)">expert 2</text>
+          <text x="290" y="126" text-anchor="middle">expert 3 ✓</text>
+          <text x="290" y="163" text-anchor="middle" font-size="10" fill="var(--pencil)">…expert N (idle)</text>
+          <text x="440" y="86" font-size="12">only ✓ run</text>
+        </g>
+      </svg>
+      <figcaption><b>Fig 14.</b> A receptionist (router) sends each token to the right specialists — not every doctor sees every patient.</figcaption>
+    </figure>
+    <ul class="notes">
+      <li><b>Load balancing</b> keeps one expert from hogging all the work — via <em>expert capacity</em> (a per-expert
+        limit), <em>auxiliary loss</em>, or adding a little noise to the router.</li>
+      <li><b>Sparse vs active parameters:</b> <mark class="mint">all</mark> experts are loaded in memory (sparse), but
+        only a <b>few run per token</b> (active). That's why you see names like <code>Qwen3-30B-A3B</code> =
+        <b>30B loaded, 3B active</b> → big-model quality, small-model speed.</li>
+      <li>Example: <b>DeepSeek-R1</b> has 256 experts per layer, picks 8, plus 1 always-on "shared" expert for general
+        knowledge.</li>
+    </ul>
+    <div class="analogy">
+      <span class="em">🏥</span>
+      <div><b>Analogy:</b> A hospital keeps many specialists <em>on payroll</em> (loaded in memory), but each patient
+      only sees the <em>two or three</em> they actually need (active). Cheaper per visit, same expertise available.</div>
+    </div>
+  </section>
+
+  <div class="divider">✦ the whole chapter on one line ✦</div>
+  <div class="bigidea" style="border-style:solid">
+    <b>Recap:</b> Text → <b>tokens</b> → the model predicts the next one. It's <b>pre-trained</b> (fill-in-the-blank on
+    the internet) then <b>post-trained</b> (SFT + RL/RLHF/RLVR) to be helpful. Inside sits a <b>Transformer</b>:
+    tokenizer → blocks of <b>attention</b> (context) + <b>feed-forward</b> (knowledge) → LM head → next token.
+    Efficiency tricks: <b>KV-cache</b>, leaner attention (MLA/DSA), and <b>Mixture-of-Experts</b>.
+  </div>
+
+  <!-- cheat sheet -->
+  <section>
+    <h2 class="sec"><span class="sec-num">★</span> Interview cheat-sheet 🎤</h2>
+    <p class="lead">Say-it-out-loud answers to the questions most likely to come from this chapter.</p>
+    <div class="qa">
+      <details open>
+        <summary><span class="q">Q.</span> In one sentence, what is an LLM?</summary>
+        <div class="ans">A model that breaks text into <b>tokens</b> and repeatedly predicts the next token — that
+          simple loop, at massive scale, produces everything from essays to code.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What's the difference between pre-training and post-training?</summary>
+        <div class="ans"><b>Pre-training</b> = next-word prediction over huge text → a knowledgeable but hard-to-steer
+          <em>base model</em>. <b>Post-training</b> (SFT + reinforcement learning) makes it follow instructions and
+          match human preferences.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> RLHF vs RLVR?</summary>
+        <div class="ans"><b>RLHF</b> scores answers using <em>human preferences</em> (preferred vs rejected).
+          <b>RLVR</b> scores them with an <em>automatic verifier</em> (right format? correct answer?) — ideal for
+          maths and code where correctness is objective.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What are the parts of a Transformer?</summary>
+        <div class="ans">A <b>tokenizer</b> (text→tokens), a stack of <b>Transformer blocks</b> (each = self-attention +
+          feed-forward), and an <b>LM head</b> that outputs a probability for every possible next token.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What does self-attention do?</summary>
+        <div class="ans">Lets each token look back at the most relevant earlier tokens to understand context — like
+          working out what "it" refers to. Computed with <b>Query, Key, Value</b> vectors.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What is temperature?</summary>
+        <div class="ans">A dial on how the next token is chosen. <b>0</b> = always pick the most likely word (predictable);
+          <b>higher</b> = sample more surprising words (creative).</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> Why do context length and the KV-cache matter?</summary>
+        <div class="ans"><b>Context length</b> caps how much text fits in the model at once (so you must curate what you
+          feed it — "context engineering"). The <b>KV-cache</b> reuses past computation to make generation faster and
+          cheaper — critical for real agents.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q.</span> What is a Mixture-of-Experts model?</summary>
+        <div class="ans">Instead of one big network, many small "experts" plus a router that activates only a few per
+          token. You get a large model's quality at a small model's running cost (e.g. "30B loaded, 3B active").</div>
+      </details>
+    </div>
+
+    <div class="tip">
+      <span class="em">🎙️</span>
+      <div><b>Trainer tip:</b> Teach this chapter with <b>three demos</b> anyone can picture — (1) type into phone
+      autocomplete = next-token prediction, (2) show a "preferred vs rejected" thumbs-up = RLHF, (3) slide a
+      "temperature" dial = creativity. Concrete beats jargon every time.</div>
+    </div>
+
+    <div class="sticky g" style="margin-top:24px">
+      <span class="t">Your 5 memory anchors</span>
+      <b>1.</b> LLM = next-token predictor &nbsp; <b>2.</b> Tokens = word-LEGO &nbsp;
+      <b>3.</b> Trained in 2 phases (learn → polish) &nbsp; <b>4.</b> Transformer = attention (context) + feed-forward (facts) &nbsp;
+      <b>5.</b> Temperature = creativity dial. 🍀
+    </div>
+    <p class="footnote">Notes based on <em>An Illustrated Guide to AI Agents</em>, Ch. 2 (Early Release) —
+      Alammar &amp; Grootendorst, O'Reilly. Simplified &amp; illustrated for study; Part 2 topics (MLA, DSA, GRPO
+      internals) are advanced and optional.</p>
+
+    <nav class="nav" style="margin-top:26px">
+      <a href="../">← Ch.1 · What is an Agent</a>
+      <span class="spacer"></span>
+      <a href="../">Back to start</a>
+    </nav>
+  </section>
+
+</div>
+</div>
+</body>
+</html>
