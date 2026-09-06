@@ -122,6 +122,16 @@
   .btn:hover{background:#1a37ac}
   footer{padding:2.5rem 0;font-size:.9rem;color:var(--ink-3);font-family:Archivo,sans-serif}
 
+  /* ---- top bar (cross-case-study nav) ---- */
+  .topbar{background:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem 1.5rem;padding:.75rem 1.5rem}
+  .topbar-home{color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;letter-spacing:-.01em}
+  .topbar-home:hover{color:var(--cobalt-soft)}
+  .topbar-links{display:flex;gap:1.4rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+  .topbar-links a{color:#B9C4CE;text-decoration:none;font-size:.88rem}
+  .topbar-links a:hover{color:#fff;text-decoration:underline}
+  .topbar-links a.current{color:#fff;font-weight:600}
+
   @media (max-width:640px){
     body{font-size:1.0625rem}
     .lede{font-size:1.15rem}
@@ -132,6 +142,16 @@
 </style>
 </head>
 <body>
+
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="topbar-home" href="/">Dhruv Gupta</a>
+    <ul class="topbar-links">
+      <li><a href="/projects/" class="current" aria-current="page">Sneaker store rebuild</a></li>
+      <li><a href="/projects/support-agents.html">Support agents</a></li>
+    </ul>
+  </div>
+</div>
 
 <div class="wrap">
 

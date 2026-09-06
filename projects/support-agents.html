@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five agents, one inbox, and a hard rule against guessing</title>
+<meta name="description" content="A case study: building a multi-agent customer support system on Google ADK for a sneaker store. A coordinator routes each question to a specialist, and no agent is allowed to answer from memory.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF0F2;
+    --panel:#FFFFFF;
+    --ink:#16202B;
+    --ink-2:#55636F;
+    --ink-3:#7C8894;
+    --cobalt:#2242C7;
+    --cobalt-soft:#DDE4FA;
+    --alarm:#C4302B;
+    --alarm-soft:#F6DEDC;
+    --line:#D5DAE0;
+    --measure:34rem;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Source Serif 4",Georgia,serif;
+    font-size:1.1875rem;line-height:1.65;font-variant-numeric:tabular-nums;
+  }
+  .wrap{max-width:60rem;margin:0 auto;padding:0 1.5rem}
+  .col{max-width:var(--measure)}
+  h1,h2,h3,nav a,.btn,.milestone b,.milestone span,.trace,.agent b,.agent .tools,.qbar,.results th,.results td.now,.stack b,.masthead .who{font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+  h1{font-size:clamp(2.3rem,5.8vw,3.7rem);line-height:1.03;letter-spacing:-.028em;font-weight:700;margin:0 0 1.25rem}
+  h2{font-size:clamp(1.5rem,3.4vw,2rem);line-height:1.12;letter-spacing:-.02em;font-weight:700;margin:0 0 .5rem}
+  h3{font-size:1.125rem;line-height:1.3;font-weight:600;margin:0 0 .4rem}
+  p{margin:0 0 1.1rem}
+  a{color:var(--cobalt)}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px;border-radius:2px}
+  strong{font-weight:600}
+  hr.rule{border:0;border-top:1px solid var(--line);margin:4.5rem 0}
+  ul.plain{padding-left:1.15rem}
+  ul.plain li{margin-bottom:.5rem}
+
+  /* ---- top bar (cross-case-study nav) ---- */
+  .topbar{background:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem 1.5rem;padding:.75rem 1.5rem}
+  .topbar-home{color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;letter-spacing:-.01em}
+  .topbar-home:hover{color:var(--cobalt-soft)}
+  .topbar-links{display:flex;gap:1.4rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+  .topbar-links a{color:#B9C4CE;text-decoration:none;font-size:.88rem}
+  .topbar-links a:hover{color:#fff;text-decoration:underline}
+  .topbar-links a.current{color:#fff;font-weight:600}
+
+  .masthead{padding:2rem 0 0}
+  .masthead .who{font-size:.95rem;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:.9rem;align-items:baseline}
+  .masthead .who b{font-weight:600;color:var(--ink)}
+  .masthead .who a{color:var(--ink-2)}
+
+  .hero{padding:3.5rem 0 1rem}
+  .lede{font-size:1.35rem;line-height:1.5;color:var(--ink-2);max-width:36rem;margin-bottom:2.75rem}
+
+  /* ---- the trace ---- */
+  .trace{max-width:44rem;background:var(--panel);border:1px solid var(--line);padding:1.4rem 1.5rem 1.5rem}
+  .trace .msg{font-family:"Source Serif 4",serif;font-size:1.05rem;line-height:1.5;border-left:3px solid var(--ink-3);padding:.15rem 0 .15rem .9rem;margin-bottom:1.4rem;color:var(--ink)}
+  .trace .msg small{display:block;font-family:Archivo,sans-serif;font-size:.8rem;color:var(--ink-3);margin-bottom:.35rem}
+  .trace ol{list-style:none;margin:0;padding:0}
+  .trace li{display:flex;gap:1rem;font-size:.95rem;line-height:1.45;padding:.42rem 0;border-bottom:1px dotted var(--line)}
+  .trace li:last-child{border-bottom:0}
+  .trace .t{flex:0 0 3.4rem;color:var(--ink-3);font-size:.85rem;padding-top:.1rem}
+  .trace .w{flex:1 1 auto;color:var(--ink-2)}
+  .trace .w b{color:var(--ink);font-weight:600}
+  .trace .out{margin-top:1.3rem;background:var(--cobalt-soft);padding:.9rem 1rem;font-family:"Source Serif 4",serif;font-size:1.05rem;line-height:1.5}
+  .trace .out small{display:block;font-family:Archivo,sans-serif;font-size:.8rem;color:var(--cobalt);margin-bottom:.35rem;font-weight:600}
+
+  nav{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:3rem;padding:.9rem 0}
+  nav ul{list-style:none;display:flex;flex-wrap:wrap;gap:.35rem 1.6rem;margin:0;padding:0}
+  nav a{font-size:.95rem;text-decoration:none;color:var(--ink-2)}
+  nav a:hover{color:var(--cobalt);text-decoration:underline}
+
+  section{padding:4.25rem 0 0}
+  .milestone{display:flex;align-items:baseline;gap:.75rem;margin-bottom:1.5rem}
+  .milestone b{font-size:2.1rem;font-weight:700;letter-spacing:-.03em;color:var(--cobalt);line-height:1}
+  .milestone span{font-size:.9rem;color:var(--ink-3)}
+
+  .callout{border-left:4px solid var(--cobalt);background:var(--panel);padding:1.4rem 1.5rem;margin:2rem 0;max-width:var(--measure)}
+  .callout p:last-child{margin-bottom:0}
+  .callout.hot{border-left-color:var(--alarm)}
+
+  /* ---- question mix ---- */
+  .qmix{max-width:42rem;margin:2rem 0}
+  .qmix .qrow{margin-bottom:.85rem}
+  .qbar{display:flex;align-items:baseline;justify-content:space-between;font-size:.95rem;margin-bottom:.28rem;gap:1rem}
+  .qbar span{color:var(--ink-2)}
+  .qbar b{font-weight:600}
+  .track{height:.7rem;background:var(--panel);border:1px solid var(--line)}
+  .track i{display:block;height:100%;background:var(--cobalt)}
+  .track.muted i{background:var(--ink-3)}
+
+  /* ---- agent map ---- */
+  .agent{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cobalt);padding:1.1rem 1.25rem;margin-bottom:.7rem}
+  .agent.coord{border-left-color:var(--ink)}
+  .agent.human{border-left-color:var(--alarm)}
+  .agent b{display:block;font-size:1.05rem;font-weight:600;margin-bottom:.25rem}
+  .agent p{font-size:1rem;line-height:1.5;color:var(--ink-2);margin:0 0 .6rem}
+  .agent .tools{display:flex;flex-wrap:wrap;gap:.35rem}
+  .agent .tools code{font-family:Archivo,sans-serif;font-size:.82rem;background:var(--paper);border:1px solid var(--line);padding:.15rem .5rem;color:var(--ink-2)}
+
+  figure{margin:2.25rem 0;padding:0}
+  figure svg{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--line)}
+  figcaption{font-size:.95rem;color:var(--ink-2);margin-top:.7rem;max-width:var(--measure)}
+  .s-box{fill:var(--panel);stroke:var(--cobalt);stroke-width:1.5}
+  .s-fill{fill:var(--cobalt-soft);stroke:var(--cobalt);stroke-width:1.5}
+  .s-dark{fill:var(--ink);stroke:var(--ink);stroke-width:1.5}
+  .s-hot{fill:var(--alarm-soft);stroke:var(--alarm);stroke-width:1.5}
+  .s-dash{fill:none;stroke:var(--ink-3);stroke-width:1.5;stroke-dasharray:5 4}
+  .s-t{font-family:Archivo,sans-serif;font-size:14px;font-weight:600;fill:var(--ink)}
+  .s-t-inv{font-family:Archivo,sans-serif;font-size:14px;font-weight:600;fill:#fff}
+  .s-s{font-family:Archivo,sans-serif;font-size:12px;font-weight:400;fill:var(--ink-2)}
+  .s-line{stroke:var(--ink-3);stroke-width:1.5;fill:none}
+
+  .results{width:100%;border-collapse:collapse;margin:2rem 0;font-size:1.05rem}
+  .results th,.results td{text-align:left;padding:.8rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+  .results th{font-size:.85rem;font-weight:600;color:var(--ink-3);border-bottom-color:var(--ink-3)}
+  .results td.was{color:var(--ink-2)}
+  .results td.now{font-weight:600;color:var(--cobalt)}
+
+  .stack{list-style:none;padding:0;margin:1.75rem 0;max-width:42rem}
+  .stack li{display:flex;flex-wrap:wrap;gap:.2rem 1rem;padding:.7rem 0;border-bottom:1px solid var(--line)}
+  .stack b{font-weight:600;flex:0 0 11rem;font-size:1rem}
+  .stack span{flex:1 1 15rem;color:var(--ink-2);font-size:1.05rem}
+
+  .close{background:var(--ink);color:var(--paper);margin-top:5rem;padding:4rem 0 3.5rem}
+  .close h2{color:#fff}
+  .close p{color:#B9C4CE;max-width:32rem}
+  .btn{display:inline-block;background:var(--cobalt);color:#fff;text-decoration:none;font-weight:600;font-size:1.05rem;padding:.85rem 1.6rem;border-radius:3px;margin-top:.5rem}
+  .btn:hover{background:#1a37ac}
+  footer{padding:2.5rem 0;font-size:.9rem;color:var(--ink-3);font-family:Archivo,sans-serif}
+
+  @media (max-width:640px){
+    body{font-size:1.0625rem}
+    .lede{font-size:1.15rem}
+    .milestone b{font-size:1.7rem}
+    .stack b{flex:0 0 100%}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="topbar-home" href="/">Dhruv Gupta</a>
+    <ul class="topbar-links">
+      <li><a href="/projects/">Sneaker store rebuild</a></li>
+      <li><a href="/projects/support-agents.html" class="current" aria-current="page">Support agents</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="who">
+      <b>Dhruv Gupta</b>
+      <span>Backend &amp; full stack engineer</span>
+      <span>Case study, 2026</span>
+      <span><a href="./">← The store this was built for</a></span>
+    </div>
+  </header>
+
+  <div class="hero">
+    <h1>Five agents, one inbox, and a hard rule against guessing</h1>
+    <p class="lede">Once the sneaker store could handle a hundred thousand people, it started collecting something else: twelve hundred customer messages a week. This is the system that answers most of them, and the rules that stop it inventing things.</p>
+
+    <div class="trace">
+      <div class="msg">
+        <small>Saturday, 11:47pm</small>
+        hey where is my order?? paid friday and still no tracking. 48812
+      </div>
+      <ol>
+        <li><span class="t">0.0s</span><span class="w">Front desk reads the message. Decides this is an <b>order question</b> and hands it to the orders agent.</span></li>
+        <li><span class="t">0.4s</span><span class="w">Orders agent looks up <b>order 48812</b>. Confirms it exists and belongs to this customer.</span></li>
+        <li><span class="t">0.9s</span><span class="w">Checks the payment. Cleared Friday, 6:12pm.</span></li>
+        <li><span class="t">1.3s</span><span class="w">Checks the shipment. <b>Packed, not yet collected by the courier.</b></span></li>
+        <li><span class="t">2.1s</span><span class="w">Writes the reply. Every fact in it came from a lookup, not from the model.</span></li>
+      </ol>
+      <div class="out">
+        <small>Reply sent, 8 seconds after the message arrived</small>
+        Your payment went through Friday at 6:12pm and the pair is packed and waiting for pickup. Our courier doesn't collect on weekends, so it goes out Monday morning and you'll get tracking the same day. Nothing has gone wrong — it's just the weekend.
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Sections">
+    <ul>
+      <li><a href="#problem">The new problem</a></li>
+      <li><a href="#asks">What people actually ask</a></li>
+      <li><a href="#failed">Why one chatbot failed</a></li>
+      <li><a href="#team">Five agents, not one brain</a></li>
+      <li><a href="#rules">Three rules</a></li>
+      <li><a href="#testing">How it's tested</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#tech">For engineers</a></li>
+    </ul>
+  </nav>
+
+  <section id="problem">
+    <div class="milestone"><b>1,200</b><span>messages a week</span></div>
+    <div class="col">
+      <h2>Solving one problem uncovered the next</h2>
+      <p>The store rebuild fixed drop day. Releases stopped falling over and post-drop complaints dropped from roughly two hundred to fifteen.</p>
+      <p>But the customer base kept growing, and everyday questions grew with it. Not the dramatic ones — the ordinary ones. Where is my order. Does this run small. Can I return these. When is the next release. By early last year that was around twelve hundred messages a week across Instagram, WhatsApp and email.</p>
+      <p>The client had two support staff. On weekends the first reply took about nine hours, because nobody was working. Sneaker customers are impatient and public about it. He was quoted a plan to hire three more people.</p>
+    </div>
+    <div class="callout">
+      <p>Hiring would have worked. It would also have cost roughly what the entire store rebuild cost, every year, forever. Worth checking whether the questions actually needed a person first.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="asks">
+    <h2>What people actually ask</h2>
+    <p class="col">I read six weeks of messages and sorted every one by hand. Two thousand of them. It is dull work and it is the only reason the rest of this project went anywhere.</p>
+
+    <div class="qmix">
+      <div class="qrow"><div class="qbar"><span>Where is my order</span><b>41%</b></div><div class="track"><i style="width:41%"></i></div></div>
+      <div class="qrow"><div class="qbar"><span>Sizing and fit</span><b>18%</b></div><div class="track"><i style="width:18%"></i></div></div>
+      <div class="qrow"><div class="qbar"><span>Returns and refunds</span><b>14%</b></div><div class="track"><i style="width:14%"></i></div></div>
+      <div class="qrow"><div class="qbar"><span>Drop rules and dates</span><b>11%</b></div><div class="track"><i style="width:11%"></i></div></div>
+      <div class="qrow"><div class="qbar"><span>Product and authenticity</span><b>9%</b></div><div class="track muted"><i style="width:9%"></i></div></div>
+      <div class="qrow"><div class="qbar"><span>Everything else, including the hard ones</span><b>7%</b></div><div class="track muted"><i style="width:7%"></i></div></div>
+    </div>
+
+    <div class="col">
+      <p>The top four categories are 84% of the inbox, and every single one of them can be answered from data the business already holds. Nobody was asking anything clever. They were asking questions that had exact answers sitting in a database, and waiting nine hours for a human to go and look.</p>
+      <p>That 84% is the ceiling, not the target. Some of those messages are angry, or confused, or three questions at once. I planned for well under the ceiling from the start.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="failed">
+    <h2>My first attempt was worse than nothing</h2>
+    <div class="col">
+      <p>I built the obvious thing first: one AI assistant, all the company's rules in one long instruction, connected to everything. It took two days and it was genuinely bad.</p>
+      <ul class="plain">
+        <li>It invented tracking numbers. Confidently. In the right format.</li>
+        <li>It quoted a fourteen-day return window when the policy is seven for sale items.</li>
+        <li>It could not reliably tell "where's my order" from "where's my refund", which are different questions with very different answers.</li>
+        <li>Every rule I added to fix one topic quietly broke another. The instruction reached four pages and became impossible to reason about.</li>
+      </ul>
+    </div>
+    <div class="callout hot">
+      <p>One assistant that knows everything is one assistant that can confuse anything with anything. The fix was not a better prompt. It was giving each kind of question its own specialist, with access to its own data and nothing else.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="team">
+    <h2>Five agents, not one brain</h2>
+    <p class="col">The system works the way a good shop floor works. Someone at the front listens to what you need and walks you to the right person. That person knows one subject properly and can open their own filing cabinet — and only theirs.</p>
+
+    <figure>
+      <svg viewBox="0 0 760 340" role="img" aria-labelledby="ag-t ag-d" xmlns="http://www.w3.org/2000/svg">
+        <title id="ag-t">How a customer message is routed</title>
+        <desc id="ag-d">A customer message goes to a front desk agent, which routes it to one of five specialists: orders, returns, sizing, drops, or handing off to a human. Each specialist queries the store's own data through a read-only interface.</desc>
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <rect class="s-box" x="300" y="12" width="160" height="44" rx="3"/>
+        <text class="s-t" x="380" y="39" text-anchor="middle">Customer message</text>
+        <line class="s-line" x1="380" y1="58" x2="380" y2="82" marker-end="url(#ar2)"/>
+
+        <rect class="s-dark" x="280" y="84" width="200" height="48" rx="3"/>
+        <text class="s-t-inv" x="380" y="105" text-anchor="middle">Front desk</text>
+        <text class="s-s" x="380" y="122" text-anchor="middle" fill="#B9C4CE">reads, routes, never answers</text>
+
+        <line class="s-line" x1="370" y1="134" x2="80" y2="166" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="375" y1="134" x2="230" y2="166" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="380" y1="134" x2="380" y2="166" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="385" y1="134" x2="530" y2="166" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="390" y1="134" x2="680" y2="166" marker-end="url(#ar2)"/>
+
+        <rect class="s-fill" x="10" y="168" width="132" height="54" rx="3"/>
+        <text class="s-t" x="76" y="190" text-anchor="middle">Orders</text>
+        <text class="s-s" x="76" y="208" text-anchor="middle">3 tools</text>
+
+        <rect class="s-fill" x="162" y="168" width="132" height="54" rx="3"/>
+        <text class="s-t" x="228" y="190" text-anchor="middle">Returns</text>
+        <text class="s-s" x="228" y="208" text-anchor="middle">3 tools</text>
+
+        <rect class="s-fill" x="314" y="168" width="132" height="54" rx="3"/>
+        <text class="s-t" x="380" y="190" text-anchor="middle">Sizing</text>
+        <text class="s-s" x="380" y="208" text-anchor="middle">3 tools</text>
+
+        <rect class="s-fill" x="466" y="168" width="132" height="54" rx="3"/>
+        <text class="s-t" x="532" y="190" text-anchor="middle">Drops</text>
+        <text class="s-s" x="532" y="208" text-anchor="middle">3 tools</text>
+
+        <rect class="s-hot" x="618" y="168" width="132" height="54" rx="3"/>
+        <text class="s-t" x="684" y="190" text-anchor="middle">To a human</text>
+        <text class="s-s" x="684" y="208" text-anchor="middle">2 tools</text>
+
+        <line class="s-line" x1="76" y1="224" x2="76" y2="266" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="228" y1="224" x2="228" y2="266" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="380" y1="224" x2="380" y2="266" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="532" y1="224" x2="532" y2="266" marker-end="url(#ar2)"/>
+        <line class="s-line" x1="684" y1="224" x2="684" y2="266" marker-end="url(#ar2)"/>
+
+        <rect class="s-dash" x="10" y="268" width="740" height="54" rx="3"/>
+        <text class="s-t" x="380" y="290" text-anchor="middle">The store's own data</text>
+        <text class="s-s" x="380" y="308" text-anchor="middle">orders, stock, payments, returns, release calendar</text>
+      </svg>
+      <figcaption>Each specialist reaches the same store, but through a door only it can open. The sizing agent has no way to read payment records, even if it somehow decided it wanted to.</figcaption>
+    </figure>
+
+    <p class="col">Here is each one, and the exact jobs it can do. Nothing outside this list is possible — not discouraged, not unlikely, but impossible.</p>
+
+    <div class="agent coord">
+      <b>Front desk</b>
+      <p>Reads the message, works out what is really being asked, and hands it to one specialist. It answers nothing itself, which means it cannot get a fact wrong. If it cannot tell what the customer wants, it asks one short clarifying question.</p>
+      <div class="tools"><code>route_to_specialist</code><code>ask_for_clarification</code></div>
+    </div>
+
+    <div class="agent">
+      <b>Orders</b>
+      <p>Finds the order, confirms it belongs to the person asking, and reports what is actually true about it right now — payment cleared, packed, handed to the courier, delivered.</p>
+      <div class="tools"><code>find_order</code><code>get_payment_status</code><code>get_shipment_tracking</code></div>
+    </div>
+
+    <div class="agent">
+      <b>Returns</b>
+      <p>Checks whether an item can be returned under the real policy for that specific order, not the general policy. Explains why if it cannot. Can start a return, but only after the customer confirms what will happen.</p>
+      <div class="tools"><code>check_return_eligibility</code><code>start_return</code><code>get_refund_status</code></div>
+    </div>
+
+    <div class="agent">
+      <b>Sizing</b>
+      <p>Answers the second most common question in sneaker retail: does this run true to size. Uses the brand's own chart, the fit notes real buyers left on that model, and what size this customer bought last time.</p>
+      <div class="tools"><code>get_size_chart</code><code>get_fit_notes</code><code>get_customer_size_history</code></div>
+    </div>
+
+    <div class="agent">
+      <b>Drops</b>
+      <p>Handles everything about releases: when the next one is, what the entry rules are, and — during a drop — where the customer currently sits in the queue.</p>
+      <div class="tools"><code>get_release_calendar</code><code>get_drop_rules</code><code>check_queue_position</code></div>
+    </div>
+
+    <div class="agent human">
+      <b>To a human</b>
+      <p>Not a fallback for failure. A deliberate exit, taken early and often. It writes a short summary of what the customer wants and what has already been checked, so the human starts informed instead of reading a transcript.</p>
+      <div class="tools"><code>summarise_for_agent</code><code>create_ticket</code></div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="rules">
+    <h2>Three rules that make it safe to trust</h2>
+    <p class="col">Most of the engineering here is not the agents. It is the fences around them.</p>
+
+    <div class="col">
+      <h3>No agent answers from memory</h3>
+      <p>Every factual claim in every reply has to come from a lookup. If a tool returns nothing, the honest answer is that we don't know and a human is coming — not a plausible guess in the right format.</p>
+      <p>This is enforced in code, not requested in an instruction. A reply containing an order number, a date or an amount that did not appear in a tool result gets stopped before the customer sees it. That single check is what killed the invented tracking numbers.</p>
+
+      <h3 style="margin-top:2rem">Anything that costs money asks first</h3>
+      <p>Looking things up is free and happens automatically. Starting a return, cancelling an order, or issuing a refund shows the customer exactly what is about to happen and waits for a yes. The agent can prepare an action. It cannot commit one on its own.</p>
+
+      <h3 style="margin-top:2rem">It hands off early rather than fighting</h3>
+      <p>Certain things send a conversation straight to a person, immediately, no matter what it is about: anger, a mention of a chargeback or legal action, a third message from the same customer within a day, or any question about whether a pair is authentic.</p>
+      <p>That last one is deliberate. Authenticity is the most sensitive subject in this business, and an automated reply about it — even a correct one — reads as a brush-off. Some questions need a name attached.</p>
+    </div>
+
+    <div class="callout">
+      <p>A support system that hands off too often is mildly disappointing. One that confidently tells a customer something false is a screenshot on Instagram. Those risks are not equal, and the design is not balanced between them.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="testing">
+    <h2>How it's tested</h2>
+    <div class="col">
+      <p>Three hundred real past conversations, each with the answer a good human support agent actually gave. Every change to any agent runs against all three hundred before it goes anywhere near a customer, and gets a score.</p>
+      <p>The first version scored 61%. It shipped at 92%, and the number is checked weekly.</p>
+      <p>The rule that keeps it honest: any answer that reaches a customer and turns out to be wrong gets added to the test set that same day. The suite only grows, and it grows fastest in exactly the places the system is weakest.</p>
+      <p>There is also a Monday morning review. The client and I read every conversation the agents handled where the customer replied unhappily. It takes twenty minutes. It has caught more real problems than any dashboard.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="results">
+    <h2>What changed</h2>
+    <p class="col">Measured over eleven months.</p>
+    <table class="results">
+      <thead>
+        <tr><th scope="col">Measure</th><th scope="col">Before</th><th scope="col">Now</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Questions resolved with no human involved</td><td class="was">0%</td><td class="now">71%</td></tr>
+        <tr><td>First reply, weekday</td><td class="was">About 40 minutes</td><td class="now">8 seconds</td></tr>
+        <tr><td>First reply, weekend</td><td class="was">About 9 hours</td><td class="now">8 seconds</td></tr>
+        <tr><td>Support staff needed</td><td class="was">3 more, quoted</td><td class="now">The same 2</td></tr>
+        <tr><td>Wrong answers reaching a customer</td><td class="was">—</td><td class="now">1 in ~400 chats</td></tr>
+        <tr><td>Customer rating, agent-resolved chats</td><td class="was">4.6 / 5 (human)</td><td class="now">4.4 / 5</td></tr>
+        <tr><td>Cost per conversation</td><td class="was">$1.80</td><td class="now">$0.04</td></tr>
+      </tbody>
+    </table>
+    <div class="col">
+      <p>Two numbers there are worth being straight about. The satisfaction score is slightly <em>below</em> what the humans scored — people still prefer a person when they get one. It wins because a decent answer in eight seconds beats a better answer in nine hours, not because it is more likeable.</p>
+      <p>And roughly one conversation in four hundred still gets something wrong. That is not zero and it will never be zero. It is small enough that the Monday review catches every case, and every case makes the test suite stronger.</p>
+      <p>The real result is what the two support staff do now. They no longer type where-is-my-order forty times a day. They handle the hard 29% — the disputes, the authenticity questions, the customers who need someone to actually care. That is the part of the job worth paying a person for.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section id="tech">
+    <h2>For engineers</h2>
+    <p class="col">The plain-English version is above. If you want the specifics:</p>
+    <ul class="stack">
+      <li><b>Google ADK</b><span>Agent Development Kit. The front desk is an <code>LlmAgent</code> with the five specialists passed as <code>sub_agents</code>, so routing is LLM-driven delegation rather than hand-written if-statements. Each specialist's <code>description</code> is what the router actually reasons over, so those descriptions get more editing than the instructions do.</span></li>
+      <li><b>Gemini</b><span>Model behind each agent. The front desk runs a smaller, faster model than the specialists — routing is an easier job than answering.</span></li>
+      <li><b>Tools</b><span>Plain Python functions. Every one hits a read-only internal API in front of the store's Postgres, scoped per agent. No agent gets a database connection.</span></li>
+      <li><b>Guardrails</b><span>ADK callbacks and plugins. <code>before_tool_callback</code> checks arguments and permissions before anything executes; <code>after_model_callback</code> is where the no-unsourced-facts check lives. Guardrails sit outside agent instructions on purpose — an instruction is a request, a callback is a rule.</span></li>
+      <li><b>Session state</b><span>Carries order context across a conversation so the customer isn't asked for their order number three times by three different specialists.</span></li>
+      <li><b>Evaluation</b><span><code>adk eval</code> against the 300-conversation evalset, wired into CI. A drop in score fails the build.</span></li>
+      <li><b>Deployment</b><span>Cloud Run, alongside the existing Node.js store. The store and the agents share data, not a codebase.</span></li>
+    </ul>
+    <p class="col">The ADK dev UI earned its keep during the build. Being able to replay a conversation and see every routing decision, prompt and tool call in order is the difference between debugging an agent system and guessing at one.</p>
+  </section>
+
+</div>
+
+<div class="close">
+  <div class="wrap">
+    <h2>Drowning in the same five questions?</h2>
+    <p>If most of your support inbox has exact answers sitting in your own database, this is a solved problem. Tell me what your customers ask and I'll tell you honestly which parts are worth automating and which are not.</p>
+    <p><a class="btn" href="mailto:dhruvgupta1992@gmail.com">Get in touch</a></p>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>Dhruv Gupta · Backend and full stack engineer · 12 years, 25+ delivered projects</footer>
+</div>
+
+</body>
+</html>
